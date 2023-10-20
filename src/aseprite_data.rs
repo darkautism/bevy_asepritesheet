@@ -1,13 +1,10 @@
-use std::ops::*;
 use bevy::{
 	prelude::*,
-	sprite::Anchor,
 	reflect::{ 
 		TypeUuid, 
 		TypePath 
 	}
 };
-use crate::sprite;
 
 /// A container to hold the json data output from aseprite
 #[derive(serde::Deserialize, TypeUuid, TypePath, Debug)]
@@ -75,49 +72,6 @@ pub struct RectData {
 }
 
 // -------------------------------------------------------------------------------------------------
-
-#[allow(dead_code)]
-impl SpriteSheetData {
-	pub fn parse_spritesheet(&self, img_handle: &Handle<Image>, frame_anchor: Anchor) -> sprite::Sheet {
-		let mut frames = Vec::<sprite::Frame>::new();
-		for frame_data in &self.frames {
-			let frame_offset = Vec2::new(
-				frame_data.sprite_source_size.x as f32,
-				frame_data.sprite_source_size.y as f32
-			);
-			let trimmed_frame_size = Vec2::new(
-				frame_data.frame.w as f32,
-				frame_data.frame.h as f32
-			);
-			let anchor_target = frame_anchor.as_vec()
-				.mul(Vec2::from(frame_data.source_size))
-				.sub(frame_offset)
-				.div(trimmed_frame_size)
-			;
-			let frame = sprite::Frame{
-				rect: frame_data.frame.into(),
-				duration: frame_data.duration as f32,
-				anchor: Anchor::Custom(anchor_target)
-			};
-			frames.push(frame);
-		}
-		let mut anims = Vec::<sprite::Anim>::new();
-		for tag_data in &self.meta.frame_tags {
-			let anim = sprite::Anim {
-				frames: (tag_data.from .. tag_data.to).collect(),
-				time_scale: 1.0,
-				end_action: sprite::AnimEndAction::LoopOver
-			};
-			anims.push(anim);
-		}
-		sprite::Sheet::new(
-			frames,
-			anims,
-			img_handle.clone(),
-			self.meta.size.into()
-		)
-	}
-}
 
 impl From<SizeData> for Vec2 {
 	fn from(value: SizeData) -> Self {
