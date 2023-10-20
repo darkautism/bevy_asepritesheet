@@ -1,4 +1,5 @@
 mod aseprite_data;
+mod sprite;
 
 use bevy::prelude::*;
 use bevy_common_assets::json::JsonAssetPlugin;
