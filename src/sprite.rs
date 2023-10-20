@@ -11,7 +11,8 @@ pub struct Sheet {
 	pub frames: Vec<Frame>,
 	pub anims: Vec<Anim>,
 	img_handle: Handle<Image>,
-	img_size: Vec2
+	img_size: Vec2,
+	atlas_handle: Option<Handle<TextureAtlas>>
 }
 
 #[derive(Clone, Debug)]
@@ -50,7 +51,8 @@ impl Sheet {
 			frames: frames,
 			anims: anims, 
 			img_handle: img_handle, 
-			img_size: img_size 
+			img_size: img_size,
+			atlas_handle: None
 		}
 	}
 
@@ -62,12 +64,24 @@ impl Sheet {
 		self.img_size.clone()
 	}
 
-	pub fn get_atlas(&self) -> TextureAtlas {
+	pub fn create_atlas_handle(
+		&mut self, 
+		atlas_assets: &mut Assets<TextureAtlas>
+	) -> Handle<TextureAtlas> {
+		if let Some(handle) = &self.atlas_handle {
+			atlas_assets.remove(handle);
+		}
 		let mut atlas = TextureAtlas::new_empty(self.img_handle().clone(), self.img_size());
 		for frame in &self.frames {
 			atlas.add_texture(frame.rect.clone());
 		}
-		atlas
+		let handle = atlas_assets.add(atlas);
+		self.atlas_handle = Some(handle.clone());
+		handle
+	}
+
+	pub fn get_atlas_handle(&self) -> Option<&Handle<TextureAtlas>> {
+		if self.atlas_handle.is_none() { None } else { Some(self.atlas_handle.as_ref().unwrap()) }
 	}
 
 	pub fn from_data(
