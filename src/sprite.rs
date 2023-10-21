@@ -12,6 +12,9 @@ use crate::aseprite_data;
 /// [`crate::sprite_animator::SpriteAnimator`] component
 #[derive(Clone, Debug)]
 pub struct Sheet {
+
+	/// A set of every possible frame that can be used for an animation within 
+	/// the spritesheet
 	pub frames: Vec<Frame>,
 	anims: Vec<Anim>,
 	img_handle: Handle<Image>,
@@ -23,9 +26,19 @@ pub struct Sheet {
 /// drawn when active
 #[derive(Clone, Debug)]
 pub struct Anim {
+
+	/// The name of the animation that can be used to find it with 
+	/// [`Sheet::get_anim_handle``]
 	pub name: String,
+
+	/// A set of the individual frames of the animation
 	pub frames: Vec<usize>,
+
+	/// A speed multiplier for the animation play rate, normal rate is 1.0, 
+	/// 0.0 is completely paused, and 2.0 will play twice as fast
 	pub time_scale: f32,
+
+	/// How the animation behaves when it reaches the end
 	pub end_action: AnimEndAction
 }
 
@@ -40,9 +53,18 @@ pub struct AnimHandle{
 /// information about the sprite as it should appear when the frame is active
 #[derive(Clone, Debug)]
 pub struct Frame {
+
+	/// the index of the sprite frame rect on the texture atlas
 	pub atlas_index: usize,
+
+	/// the duration that the frame is displayed for, in seconds
 	pub duration: f32,
+
+	/// the anchor point of the frame
 	pub anchor: Anchor,
+
+	/// the frame rect - only used when building the texture atlas, maybe 
+	/// not necessary?
 	rect: Rect // TODO remove ?
 }
 
@@ -58,7 +80,7 @@ pub enum AnimEndAction {
 	// Pause the animator after completion
 	Pause,
 
-	// Loop through the animation, starts from the beginning again on completion
+	// Loop through the animation, restarts from the beginning upon completion
 	Loop,
 
 	// Play forward and then backward and repeat indefinitely
