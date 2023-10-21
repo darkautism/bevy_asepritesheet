@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use crate::sprite;
 
 #[derive(Component)]
-struct SpriteAnimator{
-	spritesheet: sprite::Sheet,
+pub struct SpriteAnimator{
+	pub spritesheet: sprite::Sheet,
 	cur_time: f32,
 	cur_anim: Option<sprite::AnimHandle>,
 	last_frame_start: f32,
@@ -23,6 +23,24 @@ impl SpriteAnimator {
 			last_frame_start: 0.0,
 			last_anim_index: 0
 		}
+	}
+
+	pub fn cur_time(&self) -> f32 { self.cur_time }
+
+	pub fn cur_anim(&self) -> &Option<sprite::AnimHandle> { &self.cur_anim }
+
+	pub fn set_anim(&mut self, anim: sprite::AnimHandle) {
+		self.last_anim_index = 0;
+		self.last_frame_start = 0.0;
+		self.cur_time = 0.0;
+		self.cur_anim = Some(anim);
+	}
+
+	pub fn stop_anim(&mut self){
+		self.last_anim_index = 0;
+		self.last_frame_start = 0.0;
+		self.cur_time = 0.0;
+		self.cur_anim = None;
 	}
 
 	pub fn animate(&mut self, sprite: &mut TextureAtlasSprite, delta: f32) {

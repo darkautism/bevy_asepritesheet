@@ -79,20 +79,28 @@ fn load(
         if image_assets.contains(witch_spritesheet.img_handle()) {
             println!("Image Loaded!");
             state.set(AppState::Playing);
-            commands.spawn(
+            commands.spawn((
                 SpriteSheetBundle{
                     texture_atlas: witch_spritesheet.create_atlas_handle(&mut atlas_assets),
                     transform: Transform::from_scale(Vec3::new(2.0, 2.0, 1.0)),
                     ..Default::default()
-                }
-            );
+                },
+                sprite_animator::SpriteAnimator::from_sheet(
+                    witch_data_handle.1.as_ref().unwrap().clone()
+                )
+            ));
         }
     }
 }
 
-fn step(mut query: Query<&mut TextureAtlasSprite>){
-    for mut sprite in &mut query {
-        sprite.index = sprite.index + 1;
-        if sprite.index >= 50 { sprite.index = 0; }
+fn step(
+    time: Res<Time>,
+    mut query: Query<(&mut TextureAtlasSprite, &mut sprite_animator::SpriteAnimator)>
+) {
+    for (mut sprite, mut sprite_animator) in &mut query {
+        if sprite_animator.cur_anim().is_none() {
+            sprite_animator.set_anim(sprite::AnimHandle::from_index(1));
+        }
+        sprite_animator.animate(&mut sprite, time.delta_seconds());
     }
 }
