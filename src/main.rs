@@ -1,9 +1,11 @@
 mod aseprite_data;
 mod sprite;
+mod sprite_animator;
 
 use bevy::{
     prelude::*,
-    sprite::Anchor, render::color::SrgbColorSpace, core_pipeline::clear_color::ClearColorConfig
+    sprite::Anchor, 
+    core_pipeline::clear_color::ClearColorConfig
 };
 use bevy_common_assets::json::JsonAssetPlugin;
 
@@ -64,7 +66,7 @@ fn load(
     if witch_data_handle.1.is_none() {
         if let Some(witch_data) = sprite_assets.get(&witch_data_handle.0) {
             println!("Sprite Data Loaded!");
-            witch_data_handle.1 = Some(sprite::Sheet::from_data(
+            witch_data_handle.1 = Some(sprite::Sheet::from_data_image(
                 &witch_data,
                 asset_server.load::<Image, _>(&witch_data.meta.image),
                 Anchor::Center
@@ -79,7 +81,7 @@ fn load(
             state.set(AppState::Playing);
             commands.spawn(
                 SpriteSheetBundle{
-                    texture_atlas: witch_spritesheet.create_atlas_handle(&mut atlas_assets).clone(),
+                    texture_atlas: witch_spritesheet.create_atlas_handle(&mut atlas_assets),
                     transform: Transform::from_scale(Vec3::new(2.0, 2.0, 1.0)),
                     ..Default::default()
                 }
