@@ -99,7 +99,7 @@ impl Sheet {
 		for tag_data in &data.meta.frame_tags {
 			let anim = Anim {
 				name: tag_data.name.clone(),
-				frames: (tag_data.from .. tag_data.to).collect(),
+				frames: (tag_data.from ..= tag_data.to).collect(),
 				time_scale: 1.0,
 				end_action: AnimEndAction::LoopOver
 			};
