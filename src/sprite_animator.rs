@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+	prelude::*, 
+	sprite::Anchor
+};
 use crate::sprite;
 
 #[derive(Component)]
@@ -71,6 +74,7 @@ impl SpriteAnimator {
 		}
 
 		sprite.index = cur_frame.atlas_index;
+		sprite.anchor = cur_frame.anchor.clone();
 	}
 
 }

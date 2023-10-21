@@ -80,9 +80,12 @@ impl Sheet {
 				frame_data.frame.h as f32
 			);
 			let anchor_target = frame_anchor.as_vec()
+				.add(Vec2::splat(0.5))
 				.mul(Vec2::from(frame_data.source_size))
 				.sub(frame_offset)
 				.div(trimmed_frame_size)
+				.sub(Vec2::splat(0.5))
+				.mul(Vec2::new(1.0, -1.0))
 			;
 			let frame = Frame{
 				atlas_index: i,

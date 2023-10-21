@@ -101,11 +101,6 @@ fn step(
         if sprite_animator.cur_anim().is_none() {
             sprite_animator.set_anim(sprite::AnimHandle::from_index(1));
         }
-        if let Some(anim_handle) = sprite_animator.cur_anim().clone() {
-            if let Some(anim) = sprite_animator.spritesheet_mut().get_anim_mut(&anim_handle) {
-                anim.time_scale = 0.1;
-            }
-        }
         sprite_animator.animate(&mut sprite, time.delta_seconds());
     }
 }
