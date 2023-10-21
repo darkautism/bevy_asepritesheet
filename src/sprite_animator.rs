@@ -1,7 +1,4 @@
-use bevy::{
-	prelude::*, 
-	sprite::Anchor
-};
+use bevy::prelude::*;
 use crate::sprite;
 
 #[derive(Component)]
