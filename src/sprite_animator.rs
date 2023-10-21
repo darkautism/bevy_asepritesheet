@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::sprite;
+use crate::sprite::{self, AnimHandle};
 
 #[derive(Component)]
 pub struct SpriteAnimator{
@@ -34,16 +34,17 @@ impl SpriteAnimator {
 	pub fn cur_anim(&self) -> &Option<sprite::AnimHandle> { &self.cur_anim }
 
 	pub fn set_anim(&mut self, anim: sprite::AnimHandle) {
-		self.last_anim_index = 0;
-		self.last_frame_start = 0.0;
-		self.cur_time = 0.0;
+		self.reset_persistent_data();
 		self.cur_anim = Some(anim);
 	}
 
+	pub fn set_anim_index(&mut self, anim_index: usize) {
+		self.reset_persistent_data();
+		self.cur_anim = Some(AnimHandle::from_index(anim_index));
+	}
+
 	pub fn stop_anim(&mut self){
-		self.last_anim_index = 0;
-		self.last_frame_start = 0.0;
-		self.cur_time = 0.0;
+		self.reset_persistent_data();
 		self.cur_anim = None;
 	}
 
@@ -74,4 +75,9 @@ impl SpriteAnimator {
 		sprite.anchor = cur_frame.anchor.clone();
 	}
 
+	fn reset_persistent_data(&mut self) {
+		self.last_anim_index = 0;
+		self.last_frame_start = 0.0;
+		self.cur_time = 0.0;
+	}
 }
