@@ -74,6 +74,8 @@ pub struct RectData {
 // -------------------------------------------------------------------------------------------------
 
 impl From<SizeData> for Vec2 {
+
+    /// Create a vec2 from deserialized aseprite size data
 	fn from(value: SizeData) -> Self {
 		Vec2 { 
 			x: value.w as f32, 
@@ -83,6 +85,8 @@ impl From<SizeData> for Vec2 {
 }
 
 impl From<RectData> for Rect {
+
+    /// Create a rect from deserialized aseprite rect data
 	fn from(value: RectData) -> Self {
 		Rect { 
 			min: Vec2 { x: value.x as f32, y: value.y as f32 }, 

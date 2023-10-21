@@ -10,7 +10,7 @@ pub struct SpriteAnimator{
 	last_anim_index: usize
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #[allow(dead_code)]
 impl SpriteAnimator {
@@ -27,7 +27,9 @@ impl SpriteAnimator {
 
 	pub fn spritesheet(&self) -> &sprite::Sheet { &self.spritesheet }
 
-	pub fn spritesheet_mut(&mut self) -> &mut sprite::Sheet { &mut self.spritesheet }
+	pub fn spritesheet_mut(&mut self) -> &mut sprite::Sheet { 
+		&mut self.spritesheet 
+	}
 
 	pub fn cur_time(&self) -> f32 { self.cur_time }
 
