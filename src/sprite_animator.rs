@@ -3,7 +3,7 @@ use crate::sprite;
 
 #[derive(Component)]
 pub struct SpriteAnimator{
-	pub spritesheet: sprite::Sheet,
+	spritesheet: sprite::Sheet,
 	cur_time: f32,
 	cur_anim: Option<sprite::AnimHandle>,
 	last_frame_start: f32,
@@ -24,6 +24,10 @@ impl SpriteAnimator {
 			last_anim_index: 0
 		}
 	}
+
+	pub fn spritesheet(&self) -> &sprite::Sheet { &self.spritesheet }
+
+	pub fn spritesheet_mut(&mut self) -> &mut sprite::Sheet { &mut self.spritesheet }
 
 	pub fn cur_time(&self) -> f32 { self.cur_time }
 
