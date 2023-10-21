@@ -130,6 +130,8 @@ impl Sheet {
 		self.img_size.clone()
 	}
 
+	pub fn anim_count(&self) -> usize { self.anims.len() }
+
 	pub fn atlas_handle(&self) -> Option<&Handle<TextureAtlas>> {
 		if self.atlas_handle.is_none() { None } else { Some(self.atlas_handle.as_ref().unwrap()) }
 	}
