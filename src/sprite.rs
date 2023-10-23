@@ -31,15 +31,18 @@ pub struct Anim {
 	/// [`Sheet::get_anim_handle``]
 	pub name: String,
 
-	/// A set of the individual frames of the animation
-	pub frames: Vec<usize>,
-
 	/// A speed multiplier for the animation play rate, normal rate is 1.0, 
 	/// 0.0 is completely paused, and 2.0 will play twice as fast
 	pub time_scale: f32,
 
 	/// How the animation behaves when it reaches the end
-	pub end_action: AnimEndAction
+	pub end_action: AnimEndAction,
+
+	/// A set of the individual frame indices in the sprite frame set
+	frames_indices: Vec<usize>,
+
+	/// The total length of the animation in seconds
+	total_time: f32
 }
 
 /// A handle for [`Anim`] that can be used as a reference to play specific
@@ -71,7 +74,7 @@ pub struct Frame {
 /// Enum for setting different end behaviors of a sprite's animation, 
 /// default is [`AnimEndAction::Loop`]
 #[allow(dead_code)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum AnimEndAction {
 	
 	/// Stop the animation after completion, sets current animation to [`None`]
@@ -81,10 +84,7 @@ pub enum AnimEndAction {
 	Pause,
 
 	// Loop through the animation, restarts from the beginning upon completion
-	Loop,
-
-	// Play forward and then backward and repeat indefinitely
-	PingPong
+	Loop
 }
 
 // Struct Implementations: -----------------------------------------------------
@@ -180,14 +180,16 @@ impl Sheet {
 		for tag_data in &data.meta.frame_tags {
 
 			// construct animation container from data
-			let anim = Anim {
+			let mut anim = Anim {
 				name: tag_data.name.clone(),
-				frames: (tag_data.from ..= tag_data.to).collect(),
+				frames_indices: (tag_data.from ..= tag_data.to).collect(),
 				time_scale: 1.0,
-				end_action: AnimEndAction::Loop
+				end_action: AnimEndAction::Loop,
+				total_time: 0.0
 			};
-
-			// add animation to collection
+			
+			// calculate total animation time and add to anim collection
+			anim.calculate_total_time(&frames);
 			anims.push(anim);
 		}
 
@@ -293,6 +295,30 @@ impl Sheet {
 		else{
 			None
 		}
+	}
+}
+
+#[allow(dead_code)]
+impl Anim {
+
+	/// The set of indices referring to all the frames in the spritesheet that 
+	/// the animation consists of
+	pub fn frame_indices(&self) -> &Vec<usize> {
+		&self.frames_indices
+	}
+
+	/// The total amount of time that it takes to play the animation, in seconds
+	/// NOTE: does not take into account time_scale
+	pub fn total_time(&self) -> f32 {
+		self.total_time
+	}
+
+	fn calculate_total_time(&mut self, frames: &Vec<Frame>) {
+		let mut time = 0.0;
+		for frame_index in &self.frames_indices {
+			time += frames[*frame_index].duration;
+		}
+		self.total_time = time;
 	}
 }
 
