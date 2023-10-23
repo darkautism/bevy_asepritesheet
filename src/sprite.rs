@@ -120,42 +120,79 @@ impl Sheet {
 		img_handle: Handle<Image>, 
 		frame_anchor: Anchor
 	) -> Self {
+
+		// populate create a frames vec to store all frames in sprite data
 		let mut frames = Vec::<Frame>::new();
 		for (i, frame_data) in data.frames.iter().enumerate() {
+
+			// get frame offset from original frame top left corner 
+			// (only relevant if frames were trimmed by aseprite in the export)
 			let frame_offset = Vec2::new(
 				frame_data.sprite_source_size.x as f32,
 				frame_data.sprite_source_size.y as f32
 			);
+
+			// get size of the new trimmed frame
 			let trimmed_frame_size = Vec2::new(
 				frame_data.frame.w as f32,
 				frame_data.frame.h as f32
 			);
+
+			// calculate the new sprite anchor based on how much the frame was
+			// trimmed and moved by aseprite
 			let anchor_target = frame_anchor.as_vec()
-				.add(Vec2::splat(0.5))
-				.mul(Vec2::from(frame_data.source_size))
-				.sub(frame_offset)
-				.div(trimmed_frame_size)
-				.sub(Vec2::splat(0.5))
-				.mul(Vec2::new(1.0, -1.0))
+
+				// offset by 0.5 since bevy considers <-0.5,-0.5> to be top left
+				// for some reason
+				.add(Vec2::splat(0.5)) 
+				
+				// get original frame size data
+				.mul(Vec2::from(frame_data.source_size)) 
+				
+				// correct for frame offset
+				.sub(frame_offset) 
+				
+				// scale anchor pos to new trimmed size
+				.div(trimmed_frame_size) 
+				
+				// reset the 0.5 offset post-move
+				.sub(Vec2::splat(0.5)) 
+				
+				// invert y offset since aseprite and bevy use differnt coord 
+				// systems
+				.mul(Vec2::new(1.0, -1.0)) 
 			;
+
+			// construct frame container from calculated data
 			let frame = Frame{
 				atlas_index: i,
 				duration: frame_data.duration as f32 * 0.001,
 				anchor: Anchor::Custom(anchor_target),
 				rect: frame_data.frame.into()
 			};
+
+			// add frame to collection
 			frames.push(frame);
 		}
+
+		// create and populate a vec for all the sprite animations
 		let mut anims = Vec::<Anim>::new();
 		for tag_data in &data.meta.frame_tags {
+
+			// construct animation container from data
 			let anim = Anim {
 				name: tag_data.name.clone(),
 				frames: (tag_data.from ..= tag_data.to).collect(),
 				time_scale: 1.0,
 				end_action: AnimEndAction::Loop
 			};
+
+			// add animation to collection
 			anims.push(anim);
 		}
+
+		// construct and return a spritesheet from the created animation and 
+		// frame vecs and image data
 		Sheet::new(
 			frames,
 			anims,
