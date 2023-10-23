@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use crate::sprite::{self, AnimHandle};
 
+/// A component used to animate a [`TextureAtlasSprite`], which contains a 
+/// [`sprite::Sheet`] for data and reference about frames and animations
 #[derive(Component)]
 pub struct SpriteAnimator{
 	spritesheet: sprite::Sheet,
@@ -15,6 +17,7 @@ pub struct SpriteAnimator{
 #[allow(dead_code)]
 impl SpriteAnimator {
 
+	/// Create a sprite animator component from a given [`sprite::Sheet`]
 	pub fn from_sheet(sheet: sprite::Sheet) -> Self {
 		SpriteAnimator { 
 			spritesheet: sheet,
@@ -25,31 +28,40 @@ impl SpriteAnimator {
 		}
 	}
 
+	/// Get a reference to the [`sprite::Sheet`] used by this component
 	pub fn spritesheet(&self) -> &sprite::Sheet { &self.spritesheet }
 
+	/// Get a mutable reference to the [`sprite::Sheet`] used by this component
 	pub fn spritesheet_mut(&mut self) -> &mut sprite::Sheet { 
 		&mut self.spritesheet 
 	}
 
+	/// The current animation playtime elapsed since the animation was started
 	pub fn cur_time(&self) -> f32 { self.cur_time }
 
+	/// A handle to the currently playing animation if there is one
 	pub fn cur_anim(&self) -> &Option<sprite::AnimHandle> { &self.cur_anim }
 
+	/// Start playing the specified animation
 	pub fn set_anim(&mut self, anim: sprite::AnimHandle) {
 		self.reset_persistent_data();
 		self.cur_anim = Some(anim);
 	}
 
+	/// Start playing the animation at the specified index
 	pub fn set_anim_index(&mut self, anim_index: usize) {
 		self.reset_persistent_data();
 		self.cur_anim = Some(AnimHandle::from_index(anim_index));
 	}
 
+	/// Stop playing the animation so the animator is not playing any animation
 	pub fn stop_anim(&mut self){
 		self.reset_persistent_data();
 		self.cur_anim = None;
 	}
 
+	/// Play and apply the animation to the specified [`TextureAtlasSprite`]
+	/// over the specified elapsed time (delta)
 	pub fn animate(&mut self, sprite: &mut TextureAtlasSprite, delta: f32) {
 		let cur_anim = 
 			if let Some(val) = self.cur_anim.as_ref() { 
