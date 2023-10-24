@@ -334,7 +334,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_aseprite"
+name = "bevy_asepritesheet"
 version = "0.1.0"
 dependencies = [
  "bevy",

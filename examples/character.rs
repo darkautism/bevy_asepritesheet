@@ -1,13 +1,9 @@
-mod aseprite_data;
-mod sprite;
-mod sprite_animator;
-
 use bevy::{
     prelude::*,
     sprite::Anchor, 
     core_pipeline::clear_color::ClearColorConfig
 };
-use bevy_common_assets::json::JsonAssetPlugin;
+use bevy_asepritesheet::*;
 
 
 #[derive(Resource)]
@@ -27,7 +23,7 @@ fn main() {
     app
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
-            JsonAssetPlugin::<aseprite_data::SpriteSheetData>::new(&["sprite.json"])
+            asset_plugin::SpritesheetAssetPlugin::new(&["sprite.json"])
         ))
         .add_state::<AppState>()
         .add_systems(Startup, setup)
