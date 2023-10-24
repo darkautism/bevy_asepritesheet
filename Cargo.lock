@@ -340,6 +340,7 @@ dependencies = [
  "bevy",
  "bevy_common_assets",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
