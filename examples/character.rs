@@ -7,7 +7,7 @@ use bevy_asepritesheet::*;
 
 
 #[derive(Resource)]
-struct SpriteHandleResource(Handle<aseprite_data::SpriteSheetData>, Option<sprite::Sheet>);
+struct SpriteHandleResource(Handle<aseprite_data::SpritesheetData>, Option<sprite::Sheet>);
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 enum AppState {
@@ -53,7 +53,7 @@ fn load(
     mut commands: Commands,
     mut witch_data_handle: ResMut<SpriteHandleResource>,
     mut atlas_assets: ResMut<Assets<TextureAtlas>>,
-    sprite_assets: Res<Assets<aseprite_data::SpriteSheetData>>,
+    sprite_assets: Res<Assets<aseprite_data::SpritesheetData>>,
     image_assets: Res<Assets<Image>>,
     asset_server: Res<AssetServer>,
     mut state: ResMut<NextState<AppState>>

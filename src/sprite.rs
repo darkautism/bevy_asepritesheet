@@ -116,7 +116,7 @@ impl Sheet {
 	/// are NOT relative to the json file, they are relative to the bevy asset
 	/// directory
 	pub fn from_data_image(
-		data: &aseprite_data::SpriteSheetData, 
+		data: &aseprite_data::SpritesheetData, 
 		img_handle: Handle<Image>, 
 		frame_anchor: Anchor
 	) -> Self {
@@ -210,7 +210,7 @@ impl Sheet {
 	/// path, you can load the image asset manually and pass the handle to 
 	/// [`Sheet::from_data_image`] instead
 	pub fn from_data(
-		data: &aseprite_data::SpriteSheetData, 
+		data: &aseprite_data::SpritesheetData, 
 		asset_server: AssetServer,
 		frame_anchor: Anchor
 	) -> Self {
