@@ -1,4 +1,7 @@
-use std::{ops::*, usize};
+use std::{
+	ops::*, 
+	usize
+};
 use bevy::{
 	prelude::*, 
 	sprite::Anchor

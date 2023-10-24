@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::sprite::{self, AnimHandle, AnimEndAction};
+use crate::sprite;
 
 /// A component used to animate a [`TextureAtlasSprite`], which contains a 
 /// [`sprite::Sheet`] for data and reference about frames and animations
@@ -54,7 +54,7 @@ impl SpriteAnimator {
 		// animation call
 		let mut target_time = seconds;
 		if self.cur_time > seconds {
-			if cur_anim.end_action == AnimEndAction::Loop {
+			if cur_anim.end_action == sprite::AnimEndAction::Loop {
 				let anim_time = cur_anim.total_time();
 				let loop_cur_time = self.cur_time % anim_time;
 				let loop_target_time = seconds % anim_time;
@@ -92,7 +92,7 @@ impl SpriteAnimator {
 
 	/// Start playing the animation at the specified index
 	pub fn set_anim_index(&mut self, anim_index: usize) {
-		self.set_anim(AnimHandle::from_index(anim_index));
+		self.set_anim(sprite::AnimHandle::from_index(anim_index));
 	}
 
 	/// Stop playing the animation so the animator is not playing any animation
@@ -126,10 +126,11 @@ impl SpriteAnimator {
 			if self.last_anim_index >= anim_len {
 				anim_ended = true;
 				match cur_anim.end_action {
-					AnimEndAction::Loop => {
+					sprite::AnimEndAction::Loop => {
 						self.last_anim_index %= anim_len;
 					},
-					AnimEndAction::Pause | AnimEndAction::Stop => {
+					sprite::AnimEndAction::Pause | 
+					sprite::AnimEndAction::Stop => {
 						self.cur_time = cur_anim.total_time();
 						self.last_anim_index = anim_len - 1;
 						cur_frame = &frames[
@@ -148,10 +149,10 @@ impl SpriteAnimator {
 
 		if anim_ended {
 			match cur_anim.end_action {
-				AnimEndAction::Pause => {
+				sprite::AnimEndAction::Pause => {
 					self.time_scale = 0.0;
 				},
-				AnimEndAction::Stop => {
+				sprite::AnimEndAction::Stop => {
 					self.stop_anim();
 				},
 				_ => { }

@@ -338,7 +338,6 @@ name = "bevy_asepritesheet"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "bevy_common_assets",
  "serde",
  "serde_json",
 ]
@@ -390,18 +389,6 @@ dependencies = [
  "oboe",
  "parking_lot",
  "rodio",
-]
-
-[[package]]
-name = "bevy_common_assets"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0e5659f20aeaa1703e76d87c62d66f92aaa56e431fbed71bb38345b576aa6f0"
-dependencies = [
- "anyhow",
- "bevy",
- "serde",
- "serde_json",
 ]
 
 [[package]]
