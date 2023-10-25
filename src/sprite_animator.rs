@@ -135,17 +135,19 @@ impl SpriteAnimator {
 	/// # Panics
 	/// if the specified animation handle does not refer to an animation within
 	/// the spritesheet
-	pub fn set_anim(&mut self, anim: sprite::AnimHandle) {
+	pub fn set_anim(&mut self, anim: sprite::AnimHandle) -> Result<(), ()> {
 		if self.spritesheet.get_anim(&anim).is_none() { 
-			panic!("Specified animation does not exist in the spritesheet!"); 
+			return Err(());
 		}
 		self.reset_persistent_data();
 		self.cur_anim = Some(anim);
+		Ok(())
 	}
 
 	/// Start playing the animation at the specified index
-	pub fn set_anim_index(&mut self, anim_index: usize) {
-		self.set_anim(sprite::AnimHandle::from_index(anim_index));
+	pub fn set_anim_index(&mut self, anim_index: usize) -> Result<(), ()> {
+		self.set_anim(sprite::AnimHandle::from_index(anim_index))?;
+		Ok(())
 	}
 
 	/// Stop playing the animation so the animator is not playing any animation
