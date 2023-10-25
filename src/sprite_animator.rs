@@ -44,6 +44,7 @@ impl SpriteAnimator {
 	/// Set the current elapsed time in the animation
 	pub fn set_cur_time(&mut self, seconds: f32) {
 		
+		// return if no anim
 		if self.cur_anim.is_none() { return; }
 		let cur_anim = self.spritesheet.get_anim(
 			self.cur_anim.as_ref().unwrap()
@@ -85,6 +86,21 @@ impl SpriteAnimator {
 			}
 		}
 		self.cur_time = target_time;
+	}
+
+	/// Set the amount of time elapsed in the current animation, 0 being none,
+	/// and 1 being the full length of the animation
+	pub fn set_cur_time_normalized(&mut self, time_normalized: f32) {
+
+		// return if no anim
+		if self.cur_anim.is_none() { return; }
+		let cur_anim = self.spritesheet.get_anim(
+			self.cur_anim.as_ref().unwrap()
+		).unwrap();
+
+		// calculate the non-normalized time and apply it
+		let target_time = time_normalized * cur_anim.total_time();
+		self.set_cur_time(target_time);
 	}
 
 	/// A handle to the currently playing animation if there is one
