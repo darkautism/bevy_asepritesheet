@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use crate::sprite;
 
-// Types: ----------------------------------------------------------------------
+// Struct Definitions: ---------------------------------------------------------
 
 /// A component used to animate a [`TextureAtlasSprite`], which contains a 
 /// [`sprite::Sheet`] for data and reference about frames and animations
@@ -15,7 +15,7 @@ pub struct SpriteAnimator{
 	last_anim_index: usize
 }
 
-// Implementation: -------------------------------------------------------------
+// Struct Implementations: -----------------------------------------------------
 
 #[allow(dead_code)]
 impl SpriteAnimator {

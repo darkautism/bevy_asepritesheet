@@ -8,6 +8,8 @@ use bevy::{
 use serde_json::from_slice;
 use crate::aseprite_data::SpritesheetData;
 
+// Struct Definitions: ---------------------------------------------------------
+
 pub struct SpritesheetAssetPlugin {
 	extensions: Vec<&'static str>
 }
@@ -16,7 +18,7 @@ struct SpritesheetAssetLoader {
     extensions: Vec<&'static str>
 }
 
-// -----------------------------------------------------------------------------
+// Struct Implementations: -----------------------------------------------------
 
 impl Plugin for SpritesheetAssetPlugin {
 	fn build(&self, app: &mut App) {

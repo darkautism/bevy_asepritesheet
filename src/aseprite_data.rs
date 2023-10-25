@@ -6,6 +6,8 @@ use bevy::{
 	}
 };
 
+// Struct Definitions: ---------------------------------------------------------
+
 /// A container to hold the json data output from aseprite
 #[derive(serde::Deserialize, TypeUuid, TypePath, Debug)]
 #[uuid = "73461c8f-e760-4fb8-8492-37d5387fca7b"]
@@ -53,7 +55,8 @@ pub struct MetaData {
 	pub frame_tags: Vec<FrameTagData>
 }
 
-/// A container to hold size data objects used to specify 2d sizes output from aseprite
+/// A container to hold size data objects used to specify 2d sizes output 
+/// from aseprite
 #[derive(serde::Deserialize, TypeUuid, TypePath, Clone, Copy, Debug)]
 #[uuid = "a168bfd8-e587-4e52-89b3-58b50f6c1823"]
 pub struct SizeData {
@@ -61,7 +64,8 @@ pub struct SizeData {
     pub h: u16
 }
 
-/// A container to hold rect data objects used to specify 2d rectangles output from aseprite
+/// A container to hold rect data objects used to specify 2d rectangles output 
+/// from aseprite
 #[derive(serde::Deserialize, TypeUuid, TypePath, Clone, Copy, Debug)]
 #[uuid = "4643df56-80d8-4f49-91df-67fc95307b30"]
 pub struct RectData {
@@ -71,7 +75,7 @@ pub struct RectData {
     pub h: u16
 }
 
-// -------------------------------------------------------------------------------------------------
+// Struct Implementations: -----------------------------------------------------
 
 impl From<SizeData> for Vec2 {
 
@@ -90,7 +94,10 @@ impl From<RectData> for Rect {
 	fn from(value: RectData) -> Self {
 		Rect { 
 			min: Vec2 { x: value.x as f32, y: value.y as f32 }, 
-			max: Vec2 { x: (value.x + value.w) as f32, y: (value.y + value.h) as f32 }
+			max: Vec2 { 
+                x: (value.x + value.w) as f32, 
+                y: (value.y + value.h) as f32 
+            }
 		}
 	}
 }
