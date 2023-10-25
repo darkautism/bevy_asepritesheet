@@ -29,7 +29,7 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(Update, (
             load.run_if(in_state(AppState::Loading)),
-            step
+            sprite_animator::animate_sprites
         ))
     ;
     app.run();
@@ -86,17 +86,5 @@ fn load(
                 )
             ));
         }
-    }
-}
-
-fn step(
-    time: Res<Time>,
-    mut query: Query<(&mut TextureAtlasSprite, &mut sprite_animator::SpriteAnimator)>
-) {
-    for (mut sprite, mut sprite_animator) in &mut query {
-        if sprite_animator.cur_anim().is_none() {
-            sprite_animator.set_anim_index(1);
-        }
-        sprite_animator.animate(&mut sprite, time.delta_seconds());
     }
 }

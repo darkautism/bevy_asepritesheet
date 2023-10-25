@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use crate::sprite;
 
+// Types: ----------------------------------------------------------------------
+
 /// A component used to animate a [`TextureAtlasSprite`], which contains a 
 /// [`sprite::Sheet`] for data and reference about frames and animations
 #[derive(Component)]
@@ -13,7 +15,7 @@ pub struct SpriteAnimator{
 	last_anim_index: usize
 }
 
-// -----------------------------------------------------------------------------
+// Implementation: -------------------------------------------------------------
 
 #[allow(dead_code)]
 impl SpriteAnimator {
@@ -40,6 +42,22 @@ impl SpriteAnimator {
 
 	/// The current animation playtime elapsed since the animation was started
 	pub fn cur_time(&self) -> f32 { self.cur_time }
+
+	/// The elapsed time in the current animation normalized from 0 to 1, 0
+	/// meaning none of the animation has played, while 1 means the entire 
+	/// animation has played
+	pub fn cur_time_normalized(&self) -> f32 {
+		
+		// return 0 if no animation
+		let cur_anim = 
+			if let Some(val) = self.cur_anim.as_ref() { 
+				if let Some(val2) = self.spritesheet.get_anim(val) { val2 } 
+				else { return 0.0; }
+			} 
+			else { return 0.0; };
+
+		self.cur_time / cur_anim.total_time()
+	}
 
 	/// Set the current elapsed time in the animation
 	pub fn set_cur_time(&mut self, seconds: f32) {
@@ -133,6 +151,8 @@ impl SpriteAnimator {
 	/// Play and apply the animation to the specified [`TextureAtlasSprite`]
 	/// over the specified elapsed time (delta)
 	pub fn animate(&mut self, sprite: &mut TextureAtlasSprite, delta: f32) {
+
+		// return if no animation is playing
 		let cur_anim = 
 			if let Some(val) = self.cur_anim.as_ref() { 
 				if let Some(val2) = self.spritesheet.get_anim(val) { val2 } 
@@ -147,11 +167,16 @@ impl SpriteAnimator {
 		let mut next_frame_time = self.last_frame_start + cur_frame.duration;
 		self.cur_time += delta * cur_anim.time_scale * self.time_scale;
 
+		// increment the frame if current time has elapsed the current frame's
+		// duration
 		let mut anim_ended = false;
 		while self.cur_time > next_frame_time {
+
 			self.last_frame_start = next_frame_time;
 			self.last_anim_index += 1;
 			let anim_len = cur_anim.frame_indices().len();
+
+			// check if the animation has ended and set a flag if so
 			if self.last_anim_index >= anim_len {
 				anim_ended = true;
 				match cur_anim.end_action {
@@ -169,13 +194,16 @@ impl SpriteAnimator {
 					}
 				}
 			}
+
 			cur_frame = &frames[anim_frame_indices[self.last_anim_index]];
 			next_frame_time += cur_frame.duration;
 		}
 
+		// apply the new sprite and anchor in the texture atlas
 		sprite.index = cur_frame.atlas_index;
 		sprite.anchor = cur_frame.anchor.clone();
 
+		// behave according to the sprite end action if the animation ended
 		if anim_ended {
 			match cur_anim.end_action {
 				sprite::AnimEndAction::Pause => {
@@ -194,4 +222,18 @@ impl SpriteAnimator {
 		self.last_frame_start = 0.0;
 		self.cur_time = 0.0;
 	}
+}
+
+// Systems: --------------------------------------------------------------------
+
+pub fn animate_sprites(
+	time: Res<Time>,
+    mut query: Query<(&mut TextureAtlasSprite, &mut SpriteAnimator)>
+) {
+    for (mut sprite, mut sprite_animator) in &mut query {
+        if sprite_animator.cur_anim().is_none() {
+            sprite_animator.set_anim_index(1);
+        }
+        sprite_animator.animate(&mut sprite, time.delta_seconds());
+    }
 }
