@@ -6,13 +6,19 @@ use crate::sprite;
 /// A component used to animate a [`TextureAtlasSprite`], which contains a 
 /// [`sprite::Sheet`] for data and reference about frames and animations
 #[derive(Component)]
-pub struct SpriteAnimator{
+pub struct SpriteAnimator {
 	pub time_scale: f32,
 	spritesheet: sprite::Sheet,
 	cur_time: f32,
 	cur_anim: Option<sprite::AnimHandle>,
 	last_frame_start: f32,
 	last_anim_index: usize
+}
+
+#[derive(Bundle)]
+pub struct AnimatedSpriteBundle {
+	pub sprite: SpriteSheetBundle,
+	pub animator: SpriteAnimator
 }
 
 // Struct Implementations: -----------------------------------------------------

@@ -13,7 +13,7 @@ use crate::aseprite_data;
 /// A spritesheet object containing processed data from the deserialized 
 /// aseprite data. Used as reference data for the 
 /// [`crate::sprite_animator::SpriteAnimator`] component
-#[derive(Clone, Debug)]
+#[derive(Default, Clone, Debug)]
 pub struct Sheet {
 
 	/// A set of every possible frame that can be used for an animation within 

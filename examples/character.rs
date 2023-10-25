@@ -75,16 +75,18 @@ fn load(
         if image_assets.contains(witch_spritesheet.img_handle()) {
             println!("Image Loaded!");
             state.set(AppState::Playing);
-            commands.spawn((
-                SpriteSheetBundle{
-                    texture_atlas: witch_spritesheet.create_atlas_handle(&mut atlas_assets),
-                    transform: Transform::from_scale(Vec3::new(2.0, 2.0, 1.0)),
-                    ..Default::default()
-                },
-                sprite_animator::SpriteAnimator::from_sheet(
-                    witch_data_handle.1.as_ref().unwrap().clone()
-                )
-            ));
+            commands.spawn(
+                sprite_animator::AnimatedSpriteBundle{
+                    sprite: SpriteSheetBundle{
+                        texture_atlas: witch_spritesheet.create_atlas_handle(&mut atlas_assets),
+                        transform: Transform::from_scale(Vec3::new(2.0, 2.0, 1.0)),
+                        ..Default::default()
+                    },
+                    animator: sprite_animator::SpriteAnimator::from_sheet(
+                            witch_data_handle.1.as_ref().unwrap().clone()
+                    )
+                }
+            );
         }
     }
 }
