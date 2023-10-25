@@ -59,16 +59,29 @@ impl SpriteAnimator {
 				let loop_cur_time = self.cur_time % anim_time;
 				let loop_target_time = seconds % anim_time;
 				let target_loops = (seconds / anim_time).floor();
-				if loop_cur_time > loop_target_time {
-					target_time = target_loops * anim_time + loop_target_time;
-					self.last_frame_start += target_loops * anim_time;
+				if loop_cur_time <= loop_target_time {
+					self.last_frame_start = 
+						target_loops * 
+						anim_time + 
+						loop_cur_time
+					;
 				}
 				else {
-					self.reset_persistent_data();
+					if target_loops > 0.0 {
+						self.last_frame_start = target_loops * anim_time;
+						self.last_anim_index = 0;
+					}
+					else {
+						self.reset_persistent_data();
+					}
 				}
 			} else {
 				target_time = cur_anim.total_time();
-				self.reset_persistent_data();
+				self.last_anim_index = self.spritesheet.anim_count() - 1;
+				self.last_frame_start = 
+					target_time - 
+					self.spritesheet.frames[self.last_anim_index].duration
+				;
 			}
 		}
 		self.cur_time = target_time;
