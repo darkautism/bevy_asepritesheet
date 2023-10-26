@@ -3,29 +3,32 @@ use bevy::{
     sprite::Anchor, 
     core_pipeline::clear_color::ClearColorConfig
 };
-use bevy_asepritesheet::*;
+use bevy_asepritesheet::{
+    *, 
+    aseprite_data::SpritesheetData,
+    asset_plugin::SpritesheetAssetPlugin,
+    sprite::{
+        Sheet,
+        AnimEndAction
+    },
+    sprite_animator::{
+        SpriteAnimator,
+        AnimFinishEvent
+    }
+};
 
-#[derive(Resource)]
-struct SpriteHandleResource(
-    Handle<aseprite_data::SpritesheetData>, 
-    Option<sprite::Sheet>
-);
-
-#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-enum AppState {
-    #[default]
-    Loading,
-    Playing
-}
-
-// -----------------------------------------------------------------------------
+// Entry Point: ----------------------------------------------------------------
 
 fn main() {
     let mut app = App::new();
     app
+
+        // adding the SpritesheetAssetPlugin adds the asset loader to the game
+        // and the AnimFinishEvent event which is sent whenever any animation
+        // an animated spritesheet is complete
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
-            asset_plugin::SpritesheetAssetPlugin::new(&["sprite.json"])
+            SpritesheetAssetPlugin::new(&["sprite.json"])
         ))
         .add_state::<AppState>()
         .add_systems(Startup, setup)
@@ -39,13 +42,118 @@ fn main() {
     app.run();
 }
 
+// Struct Definitions: ---------------------------------------------------------
+
+#[derive(Resource)]
+struct SpriteHandleResource{
+    spritesheet_data: Handle<SpritesheetData>,
+    spritesheet: Option<Sheet>
+}
+
+#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
+enum AppState {
+    #[default]
+    Loading,
+    Playing
+}
+
+// Utility: --------------------------------------------------------------------
+
+/// format the spritesheet animations for the witch character
+fn format_witch_anims(witch_sheet: &mut sprite::Sheet) -> Result<(),()> {
+
+    // get handles for all the needed animations
+    let handle_idle = witch_sheet.get_anim_handle("idle")
+        .ok_or(())?;
+    // let handle_running = witch_sheet.get_anim_handle("running")
+    //    .ok_or(())?;
+    let handle_bow = witch_sheet.get_anim_handle("bow")
+        .ok_or(())?;
+    let handle_jump_prepare = witch_sheet.get_anim_handle("jump_prepare")
+        .ok_or(())?;
+    let handle_jump = witch_sheet.get_anim_handle("jump")
+        .ok_or(())?;
+    let handle_fall_transition = witch_sheet.get_anim_handle("fall_transition")
+        .ok_or(())?;
+    let handle_falling = witch_sheet.get_anim_handle("falling")
+        .ok_or(())?;
+    let handle_fall_land = witch_sheet.get_anim_handle("fall_land")
+        .ok_or(())?;
+    // let handle_slide = witch_sheet.get_anim_handle("slide")
+    //    .ok_or(())?;
+    let handle_attack_light = witch_sheet.get_anim_handle("attack_light")
+        .ok_or(())?;
+    let handle_attack_heavy = witch_sheet.get_anim_handle("attack_heavy")
+        .ok_or(())?;
+    let handle_damage = witch_sheet.get_anim_handle("damage")
+        .ok_or(())?;
+    // let handle_face_background = witch_sheet.get_anim_handle("face_background")
+    //    .ok_or(())?;
+
+    // have the bow animation pause at the end
+    let anim_bow = witch_sheet.get_anim_mut(&handle_bow)
+        .ok_or(())?;
+    anim_bow.end_action = AnimEndAction::Pause;
+
+    // when the jump prepare animation finishes, play the jump animation
+    let anim_jump_prepare = witch_sheet.get_anim_mut(&handle_jump_prepare)
+        .ok_or(())?;
+    anim_jump_prepare.end_action = AnimEndAction::Next(handle_jump);
+    
+    // when the jump animation finishes, play the fall transition animation
+    let anim_jump = witch_sheet.get_anim_mut(&handle_jump)
+        .ok_or(())?;
+    anim_jump.end_action = AnimEndAction::Next(handle_fall_transition);
+
+    // when the fall transition animation finishes, play the falling animation
+    let anim_fall_transition = witch_sheet.get_anim_mut(&handle_fall_transition)
+        .ok_or(())?;
+    anim_fall_transition.end_action = AnimEndAction::Next(handle_falling);
+    
+    // when the falling animation finishes, play the fall land animation
+    let anim_falling = witch_sheet.get_anim_mut(&handle_falling)
+        .ok_or(())?;
+    anim_falling.end_action = AnimEndAction::Next(handle_fall_land);
+    
+    // when the fall land animation finishes, play the idle animation
+    let anim_fall_land = witch_sheet.get_anim_mut(&handle_fall_land)
+        .ok_or(())?;
+    anim_fall_land.end_action = AnimEndAction::Next(handle_idle);
+    
+    // when the attack light animation finishes, play the idle animation
+    let anim_attack_light = witch_sheet.get_anim_mut(&handle_attack_light)
+        .ok_or(())?;
+    anim_attack_light.end_action = AnimEndAction::Next(handle_idle);
+    
+    // when the attack_heavy animation finishes, play the idle animation
+    let anim_attack_heavy = witch_sheet.get_anim_mut(&handle_attack_heavy)
+        .ok_or(())?;
+    anim_attack_heavy.end_action = AnimEndAction::Next(handle_idle);
+    
+    // when the damage animation finishes, play the idle animation
+    let anim_damage = witch_sheet.get_anim_mut(&handle_damage)
+        .ok_or(())?;
+    anim_damage.end_action = AnimEndAction::Next(handle_idle);
+    
+    Ok(())
+}
+
+// Systems: --------------------------------------------------------------------
+
+/// Initial set up system that runs at start of the game
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>
 ) {
+    // insert the resource that holds information about our spritesheet asset
     commands.insert_resource(
-        SpriteHandleResource(asset_server.load("witch.sprite.json"), None)
+        SpriteHandleResource {
+            spritesheet_data: asset_server.load("witch.sprite.json"),
+            spritesheet: None
+        }
     );
+
+    // create the camera so we can see the sprite
     commands.spawn(Camera2dBundle {
         camera_2d: Camera2d {
             clear_color: ClearColorConfig::Custom(Color::rgb(0.3, 0.3, 0.3)),
@@ -55,6 +163,7 @@ fn setup(
     });
 }
 
+/// System that handles loading/processing assets while in 'loading' appstate
 fn load(
     mut commands: Commands,
     mut witch_data_handle: ResMut<SpriteHandleResource>,
@@ -65,10 +174,17 @@ fn load(
     mut state: ResMut<NextState<AppState>>
 ) {
 
-    if witch_data_handle.1.is_none() {
-        if let Some(witch_data) = sprite_assets.get(&witch_data_handle.0) {
+    // if the witch sprite object is not yet created
+    if witch_data_handle.spritesheet.is_none() {
+
+        // if the spritesheet data is loaded and parsed
+        if let Some(witch_data) = 
+            sprite_assets.get(&witch_data_handle.spritesheet_data) 
+        {
             println!("Sprite Data Loaded!");
-            witch_data_handle.1 = Some(sprite::Sheet::from_data_image(
+
+            // create the spritesheet object and store it in the resource
+            witch_data_handle.spritesheet = Some(sprite::Sheet::from_data_image(
                 &witch_data,
                 asset_server.load::<Image, _>(&witch_data.meta.image),
                 Anchor::Center
@@ -76,64 +192,56 @@ fn load(
         }
     }
 
+    // after sprite object has been created and stored in the resource
     else {
-        let witch_sheet = witch_data_handle.1.as_mut().unwrap();
+
+        // get a mutable ref to the spritesheet and ensure the image is loaded
+        let witch_sheet = witch_data_handle.spritesheet.as_mut().unwrap();
         if image_assets.contains(witch_sheet.img_handle()) {
             println!("Image Loaded!");
 
-            // set all animations which are not meant to loop, to pause at the 
-            // end instead of looping
-            let non_looping_anims = [
-                "bow",
-                "fall_land",
-                "attack_light",
-                "attack_heavy",
-                "damage"
-            ];
-            for anim_name in non_looping_anims {
-                if let Some(anim) = witch_sheet.get_anim_mut(
-                    &witch_sheet.get_anim_handle(anim_name).unwrap()
-                ) {
-                    anim.end_action = sprite::AnimEndAction::Pause;
-                }
-            }
-
-            // setup an animation sequence where the "fall_transition" animation
-            // seamlessly transitions into the "falling" animation
-            if let Some(next_anim) = witch_sheet.get_anim_handle("falling") {
-                if let Some(anim) = witch_sheet.get_anim_mut(
-                    &witch_sheet.get_anim_handle("fall_transition").unwrap()
-                ){
-                    anim.end_action = sprite::AnimEndAction::Next(next_anim)
-                }
-            }
+            // set up the animations to behave properly
+            format_witch_anims(witch_sheet)
+                .expect("ERROR: Could not format animations");
 
             // spawn the animated sprite entity
             commands.spawn(
+
+                // use the animated sprite bundle to spawn an entity with all 
+                // the needed components to have an animated object from an
+                // aseprite exported file
                 sprite_animator::AnimatedSpriteBundle{
                     sprite: SpriteSheetBundle{
                         texture_atlas: witch_sheet.create_atlas_handle(
                             &mut atlas_assets
                         ),
                         transform: Transform::from_scale(
-                            Vec3::new(2.0, 2.0, 1.0)
+                            Vec3::new(4.0, 4.0, 1.0)
                         ),
                         ..Default::default()
                     },
                     animator: sprite_animator::SpriteAnimator::from_sheet(
-                            witch_data_handle.1.as_ref().unwrap().clone()
+                            witch_data_handle
+                            .spritesheet
+                            .as_ref().unwrap().clone()
                     )
                 }
             );
+
+            // finish the loading state of the app and move on
             state.set(AppState::Playing);
         }
     }
 }
 
+/// System that allows the player to select the character animation with keys
+/// 0 - 9 and q - p
 fn control_animation(
     input: Res<Input<KeyCode>>,
     mut query: Query<&mut sprite_animator::SpriteAnimator>
 ) {
+
+    // get animation index from keypress
     let mut anim_index:Option<usize> = None;
     for key in input.get_just_pressed() {
         anim_index = match key {
@@ -164,16 +272,30 @@ fn control_animation(
     if anim_index.is_none() { return; }
     let anim_index = anim_index.unwrap();
 
+    // apply the animation index, or log warning if invalid index
     for mut sprite_animator in &mut query {
-        let _ = sprite_animator.set_anim_index(anim_index);
         sprite_animator.time_scale = 1.0;
+        if let Err(_) = sprite_animator.set_anim_index(anim_index) {
+            warn!("WARN: Invalid index");
+        }
     }
 }
 
+/// System that handles logging a message whenever an animation finishes playing
 fn log_anim_events(
-    mut events: EventReader<sprite_animator::AnimFinishEvent>
+    mut events: EventReader<AnimFinishEvent>,
+    animators: Query<&SpriteAnimator>
 ) {
     for event in events.iter() {
+
+        // don't print the message if the animation is looping
+        if let Ok(animator) = animators.get(event.entity) {
+            if let Some(anim) = animator.spritesheet().get_anim(&event.anim) {
+                if anim.end_action == AnimEndAction::Loop { 
+                    continue; 
+                }
+            }
+        }
         println!("Animation {:?} complete!", event.anim);
     }
 }
