@@ -77,7 +77,7 @@ Then, you will need to add the plugin to your bevy app:
 use bevy::prelude::*;
 use bevy_asepritesheet::asset_plugin::SpritesheetAssetPlugin;
 use bevy_asepritesheet::sprite_animator::SpriteAnimator;
-use bevy_asepritesheet::aseprite_data::SpritesheetData;
+use bevy_asepritesheet::aseprite_data::*;
 
 fn main() {
 	App::new()
@@ -110,8 +110,10 @@ fn create_entity(
 		commands.spawn(
             AnimatedSpriteBundle{
                 sprite: SpriteSheetBundle{
-                    texture_atlas: sheet_data.create_atlas_handle(&mut atlas_assets),
-                    transform: Transform::from_scale(Vec3::new(4.0, 4.0, 1.0)),
+                    texture_atlas: 
+						sheet_data.create_atlas_handle(&mut atlas_assets),
+                    transform: 
+						Transform::from_scale(Vec3::new(4.0, 4.0, 1.0)),
                     ..Default::default()
                 },
                 animator: SpriteAnimator::from_sheet(
