@@ -39,4 +39,8 @@ Features:
 	going to implement it, you can always reverse the frames if you want to 
 	reverse the animation  
 
-![Spritesheet](/assets/witch.png)
+Example:
+
+The package is capable of parsing spritesheets that look like this into distinct
+animations based on the aseprite json data
+![Spritesheet](/assets/witch.png) ![Animation](/media/example.gif)
