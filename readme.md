@@ -13,6 +13,20 @@ distinct animations based on the aseprite json data.
 
 ## Features
 
+Asset loader - asset loader can be specified to use whatever file extensions
+you need
+
+Sprite animator - the library includes a sprite animator component and bundle
+to help you spawn entities which have animated sprites on them
+
+Plugin - the library includes a bevy plugin that you can add to the bevy app,
+this adds the asset loader, registers the animation event system, and sets up
+a system that automatically animates any sprite animator components in the game
+world
+
+Animation end actions - animations can loop, pause, stop, or transition to 
+another animation upon completion, all configurable through the library
+
 ### Aseprite Feature Support
 
 Bevy Asepritesheet supports most features that aseprite exports as json data 
