@@ -125,4 +125,16 @@ fn create_entity(
 }
 ```
 
-For a more complete example, see [examples/character.rs](examples/character.rs).
+### Run the example
+
+To run the example:
+```
+cargo run --example character
+```
+
+To see the complete example, see [examples/character.rs](examples/character.rs).
+
+# Asset Credit
+
+The asset I used is a modified version of a free assset made by Legnops  
+https://legnops.itch.io/red-hood-character
