@@ -21,7 +21,7 @@ pub struct AnimatedSpriteBundle {
 	pub animator: SpriteAnimator
 }
 
-#[derive(Event)]
+#[derive(Event, Debug)]
 pub struct AnimFinishEvent {
 	pub entity: Entity,
 	pub anim: sprite::AnimHandle
@@ -203,7 +203,8 @@ impl SpriteAnimator {
 						self.last_anim_index %= anim_len;
 					},
 					sprite::AnimEndAction::Pause | 
-					sprite::AnimEndAction::Stop => {
+					sprite::AnimEndAction::Stop |
+					sprite::AnimEndAction::Next(_) => {
 						self.cur_time = cur_anim.total_time();
 						self.last_anim_index = anim_len - 1;
 						cur_frame = &frames[
@@ -211,7 +212,6 @@ impl SpriteAnimator {
 						];
 						break;
 					}
-					_ => { }
 				}
 			}
 

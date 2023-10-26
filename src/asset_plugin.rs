@@ -6,7 +6,7 @@ use bevy::{
 	}
 };
 use serde_json::from_slice;
-use crate::aseprite_data::SpritesheetData;
+use crate::{aseprite_data::SpritesheetData, sprite_animator};
 
 // Struct Definitions: ---------------------------------------------------------
 
@@ -27,8 +27,8 @@ impl Plugin for SpritesheetAssetPlugin {
             	extensions: self.extensions.clone()
         	}
 		);
+		app.add_event::<sprite_animator::AnimFinishEvent>();
 	}
-
 }
 
 impl SpritesheetAssetPlugin {

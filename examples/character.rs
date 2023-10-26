@@ -32,7 +32,8 @@ fn main() {
         .add_systems(Update, (
             load.run_if(in_state(AppState::Loading)),
             sprite_animator::animate_sprites,
-            control_animation
+            control_animation,
+            log_anim_events
         ))
     ;
     app.run();
@@ -76,22 +77,29 @@ fn load(
     }
 
     else {
-        let witch_spritesheet = witch_data_handle.1.as_mut().unwrap();
-        if image_assets.contains(witch_spritesheet.img_handle()) {
+        let witch_sheet = witch_data_handle.1.as_mut().unwrap();
+        if image_assets.contains(witch_sheet.img_handle()) {
 
             let non_looping_anims = [
                 "bow",
-                "fall_transition",
                 "fall_land",
                 "attack_light",
                 "attack_heavy",
                 "damage"
             ];
             for anim_name in non_looping_anims {
-                if let Some(anim) = witch_spritesheet.get_anim_mut(
-                    &witch_spritesheet.get_anim_handle(anim_name).unwrap()
+                if let Some(anim) = witch_sheet.get_anim_mut(
+                    &witch_sheet.get_anim_handle(anim_name).unwrap()
                 ) {
                     anim.end_action = sprite::AnimEndAction::Pause;
+                }
+            }
+
+            if let Some(next_anim) = witch_sheet.get_anim_handle("falling") {
+                if let Some(anim) = witch_sheet.get_anim_mut(
+                    &witch_sheet.get_anim_handle("fall_transition").unwrap()
+                ){
+                    anim.end_action = sprite::AnimEndAction::Next(next_anim)
                 }
             }
 
@@ -100,7 +108,7 @@ fn load(
             commands.spawn(
                 sprite_animator::AnimatedSpriteBundle{
                     sprite: SpriteSheetBundle{
-                        texture_atlas: witch_spritesheet.create_atlas_handle(
+                        texture_atlas: witch_sheet.create_atlas_handle(
                             &mut atlas_assets
                         ),
                         transform: Transform::from_scale(
@@ -134,6 +142,16 @@ fn control_animation(
             KeyCode::Key7 => Some(7),
             KeyCode::Key8 => Some(8),
             KeyCode::Key9 => Some(9),
+            KeyCode::Q => Some(10),
+            KeyCode::W => Some(11),
+            KeyCode::E => Some(12),
+            KeyCode::R => Some(13),
+            KeyCode::T => Some(14),
+            KeyCode::Y => Some(15),
+            KeyCode::U => Some(16),
+            KeyCode::I => Some(17),
+            KeyCode::O => Some(18),
+            KeyCode::P => Some(19),
             _ => None
         };
         if anim_index.is_some() { break; }
@@ -144,5 +162,13 @@ fn control_animation(
     for mut sprite_animator in &mut query {
         let _ = sprite_animator.set_anim_index(anim_index);
         sprite_animator.time_scale = 1.0;
+    }
+}
+
+fn log_anim_events(
+    mut events: EventReader<sprite_animator::AnimFinishEvent>
+) {
+    for event in events.iter() {
+        println!("Animation {:?} complete!", event.anim);
     }
 }
