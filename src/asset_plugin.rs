@@ -22,12 +22,15 @@ struct SpritesheetAssetLoader {
 
 impl Plugin for SpritesheetAssetPlugin {
 	fn build(&self, app: &mut App) {
-        app.add_asset::<SpritesheetData>().add_asset_loader(
-			SpritesheetAssetLoader {
-            	extensions: self.extensions.clone()
-        	}
-		);
-		app.add_event::<sprite_animator::AnimFinishEvent>();
+		app
+			.add_asset::<SpritesheetData>().add_asset_loader(
+				SpritesheetAssetLoader {
+        	    	extensions: self.extensions.clone()
+        		}
+			)
+			.add_event::<sprite_animator::AnimFinishEvent>()
+        	.add_systems(PostUpdate, sprite_animator::animate_sprites)
+		;
 	}
 }
 

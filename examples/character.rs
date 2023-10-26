@@ -4,7 +4,6 @@ use bevy::{
     core_pipeline::clear_color::ClearColorConfig
 };
 use bevy_asepritesheet::{
-    *, 
     aseprite_data::SpritesheetData,
     asset_plugin::SpritesheetAssetPlugin,
     sprite::{
@@ -13,7 +12,8 @@ use bevy_asepritesheet::{
     },
     sprite_animator::{
         SpriteAnimator,
-        AnimFinishEvent
+        AnimFinishEvent, 
+        AnimatedSpriteBundle
     }
 };
 
@@ -34,7 +34,6 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(Update, (
             load.run_if(in_state(AppState::Loading)),
-            sprite_animator::animate_sprites,
             control_animation,
             log_anim_events
         ))
@@ -60,7 +59,7 @@ enum AppState {
 // Utility: --------------------------------------------------------------------
 
 /// format the spritesheet animations for the witch character
-fn format_witch_anims(sheet: &mut sprite::Sheet) -> Result<(),()> {
+fn format_witch_anims(sheet: &mut Sheet) -> Result<(),()> {
 
     // get handles for all the needed animations
     let handle_idle = sheet.get_anim_handle("idle")?;
@@ -146,7 +145,7 @@ fn load(
     mut commands: Commands,
     mut witch_data_handle: ResMut<SpriteHandleResource>,
     mut atlas_assets: ResMut<Assets<TextureAtlas>>,
-    sprite_assets: Res<Assets<aseprite_data::SpritesheetData>>,
+    sprite_assets: Res<Assets<SpritesheetData>>,
     image_assets: Res<Assets<Image>>,
     asset_server: Res<AssetServer>,
     mut state: ResMut<NextState<AppState>>
@@ -162,7 +161,7 @@ fn load(
             println!("Sprite Data Loaded!");
 
             // create the spritesheet object and store it in the resource
-            witch_data_handle.spritesheet = Some(sprite::Sheet::from_data_image(
+            witch_data_handle.spritesheet = Some(Sheet::from_data_image(
                 &witch_data,
                 asset_server.load::<Image, _>(&witch_data.meta.image),
                 Anchor::Center
@@ -188,7 +187,7 @@ fn load(
                 // use the animated sprite bundle to spawn an entity with all 
                 // the needed components to have an animated object from an
                 // aseprite exported file
-                sprite_animator::AnimatedSpriteBundle{
+                AnimatedSpriteBundle{
                     sprite: SpriteSheetBundle{
                         texture_atlas: witch_sheet.create_atlas_handle(
                             &mut atlas_assets
@@ -198,7 +197,7 @@ fn load(
                         ),
                         ..Default::default()
                     },
-                    animator: sprite_animator::SpriteAnimator::from_sheet(
+                    animator: SpriteAnimator::from_sheet(
                             witch_data_handle
                             .spritesheet
                             .as_ref().unwrap().clone()
@@ -216,7 +215,7 @@ fn load(
 /// 0 - 9 and q - p
 fn control_animation(
     input: Res<Input<KeyCode>>,
-    mut query: Query<&mut sprite_animator::SpriteAnimator>
+    mut query: Query<&mut SpriteAnimator>
 ) {
 
     // get animation index from keypress
