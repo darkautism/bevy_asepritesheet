@@ -68,10 +68,6 @@ First, you'll need to add the dependency to your `Cargo.toml`` file:
 bevy_aseprite = "0.2"
 ```
 
-### NOTE  
-Note - this will not actually work yet since I have not registered the package
-as a rust crate
-
 Then, you will need to add the plugin to your bevy app:  
 ```rs
 use bevy::prelude::*;
