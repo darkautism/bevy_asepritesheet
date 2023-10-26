@@ -9,7 +9,6 @@ repository = "https://gitlab.com/Technostalgic/bevy_asepritesheet"
 categories = ["game-development"]
 readme = "readme.md"
 license-file = "LICENSE"
-license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
