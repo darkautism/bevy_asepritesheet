@@ -50,7 +50,7 @@ pub struct Anim {
 
 /// A handle for [`Anim`] that can be used as a reference to play specific
 /// animations on a spritesheet
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct AnimHandle{
 	index: usize
 }
@@ -87,7 +87,10 @@ pub enum AnimEndAction {
 	Pause,
 
 	// Loop through the animation, restarts from the beginning upon completion
-	Loop
+	Loop,
+
+	// After completion, play the next specified animation
+	Next(AnimHandle)
 }
 
 // Struct Implementations: -----------------------------------------------------

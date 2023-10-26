@@ -21,6 +21,12 @@ pub struct AnimatedSpriteBundle {
 	pub animator: SpriteAnimator
 }
 
+#[derive(Event)]
+pub struct AnimFinishEvent {
+	pub entity: Entity,
+	pub anim: sprite::AnimHandle
+}
+
 // Struct Implementations: -----------------------------------------------------
 
 #[allow(dead_code)]
@@ -158,7 +164,12 @@ impl SpriteAnimator {
 
 	/// Play and apply the animation to the specified [`TextureAtlasSprite`]
 	/// over the specified elapsed time (delta)
-	pub fn animate(&mut self, sprite: &mut TextureAtlasSprite, delta: f32) {
+	pub fn animate(
+		&mut self, 
+		self_entity: &Entity,
+		sprite: &mut TextureAtlasSprite,
+		events: &mut EventWriter<AnimFinishEvent>,
+		delta: f32) {
 
 		// return if no animation is playing
 		let cur_anim = 
@@ -200,6 +211,7 @@ impl SpriteAnimator {
 						];
 						break;
 					}
+					_ => { }
 				}
 			}
 
@@ -213,6 +225,14 @@ impl SpriteAnimator {
 
 		// behave according to the sprite end action if the animation ended
 		if anim_ended {
+
+			// send an event letting the program know the animation finished
+			events.send(AnimFinishEvent { 
+				entity: *self_entity,
+				anim: *self.cur_anim.as_ref().unwrap()
+			});
+
+			// act according to end action type
 			match cur_anim.end_action {
 				sprite::AnimEndAction::Pause => {
 					self.time_scale = 0.0;
@@ -220,6 +240,11 @@ impl SpriteAnimator {
 				sprite::AnimEndAction::Stop => {
 					self.stop_anim();
 				},
+				sprite::AnimEndAction::Next(anim) => {
+					self.set_anim(anim).expect(
+						"ERROR: Failed to set specified animation"
+					);
+				}
 				_ => { }
 			}
 		}
@@ -236,12 +261,18 @@ impl SpriteAnimator {
 
 pub fn animate_sprites(
 	time: Res<Time>,
-    mut query: Query<(&mut TextureAtlasSprite, &mut SpriteAnimator)>
+	mut events: EventWriter<AnimFinishEvent>,
+    mut query: Query<(Entity, &mut TextureAtlasSprite, &mut SpriteAnimator)>
 ) {
-    for (mut sprite, mut sprite_animator) in &mut query {
+    for (entity, mut sprite, mut sprite_animator) in &mut query {
         if sprite_animator.cur_anim().is_none() {
-            sprite_animator.set_anim_index(1);
+            sprite_animator.set_anim_index(1).expect("ERROR: Invalid anim");
         }
-        sprite_animator.animate(&mut sprite, time.delta_seconds());
+        sprite_animator.animate(
+			&entity, 
+			&mut sprite, 
+			&mut events, 
+			time.delta_seconds()
+		);
     }
 }
