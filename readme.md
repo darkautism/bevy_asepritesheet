@@ -38,3 +38,5 @@ Features:
 	plays in reverse or forwards, I don't really see a point to this so I'm not
 	going to implement it, you can always reverse the frames if you want to 
 	reverse the animation  
+
+![Spritesheet](/assets/witch.png)
