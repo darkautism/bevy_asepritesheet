@@ -79,7 +79,10 @@ fn load(
     else {
         let witch_sheet = witch_data_handle.1.as_mut().unwrap();
         if image_assets.contains(witch_sheet.img_handle()) {
+            println!("Image Loaded!");
 
+            // set all animations which are not meant to loop, to pause at the 
+            // end instead of looping
             let non_looping_anims = [
                 "bow",
                 "fall_land",
@@ -95,6 +98,8 @@ fn load(
                 }
             }
 
+            // setup an animation sequence where the "fall_transition" animation
+            // seamlessly transitions into the "falling" animation
             if let Some(next_anim) = witch_sheet.get_anim_handle("falling") {
                 if let Some(anim) = witch_sheet.get_anim_mut(
                     &witch_sheet.get_anim_handle("fall_transition").unwrap()
@@ -103,8 +108,7 @@ fn load(
                 }
             }
 
-            println!("Image Loaded!");
-            state.set(AppState::Playing);
+            // spawn the animated sprite entity
             commands.spawn(
                 sprite_animator::AnimatedSpriteBundle{
                     sprite: SpriteSheetBundle{
@@ -121,6 +125,7 @@ fn load(
                     )
                 }
             );
+            state.set(AppState::Playing);
         }
     }
 }
