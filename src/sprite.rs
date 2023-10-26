@@ -4,7 +4,7 @@ use std::{
 };
 use bevy::{
 	prelude::*, 
-	sprite::Anchor
+	sprite::Anchor, reflect::Reflect
 };
 use crate::aseprite_data;
 
@@ -227,9 +227,9 @@ impl Sheet {
 		)
 	}
 
-	/// Get a reference to the image handle that the spritesheet is using
-	pub fn img_handle(&self) -> &Handle<Image> {
-		&self.img_handle
+	/// Get the image handle that the spritesheet is using
+	pub fn img_handle(&self) -> Handle<Image> {
+		self.img_handle.clone()
 	}
 
 	/// Get the dimensions of the image asset being used by the spritesheet
@@ -241,11 +241,12 @@ impl Sheet {
 	pub fn anim_count(&self) -> usize { self.anims.len() }
 
 	/// Get a reference to the texture atlas being used for the spritesheet
-	pub fn atlas_handle(&self) -> Option<&Handle<TextureAtlas>> {
-		if self.atlas_handle.is_none() { 
-			None 
-		} else { 
-			Some(self.atlas_handle.as_ref().unwrap()) 
+	pub fn atlas_handle(&self) -> Option<Handle<TextureAtlas>> {
+		if let Some(handle) = self.atlas_handle.clone() {
+			Some(handle)
+		}
+		else {
+			None
 		}
 	}
 
@@ -274,32 +275,35 @@ impl Sheet {
 	pub fn get_anim_handle<T: AsRef<str>>(
 		&self, 
 		name: T
-	) -> Option<AnimHandle> {
+	) -> Result<AnimHandle, ()> {
 		for (i, anim) in self.anims.iter().enumerate() {
 			if anim.name == name.as_ref() { 
-				return Some(AnimHandle { index: i });
+				return Ok(AnimHandle { index: i });
 			}
 		}
-		None
+		Err(())
 	}
 
 	/// Get a reference to the specified animation, if it exists
-	pub fn get_anim(&self, handle: &AnimHandle) -> Option<&Anim> {
+	pub fn get_anim(&self, handle: &AnimHandle) -> Result<&Anim, ()> {
 		if self.anims.len() > handle.index {
-			Some(&self.anims[handle.index])
+			Ok(&self.anims[handle.index])
 		}
 		else{
-			None
+			Err(())
 		}
 	}
 
 	/// Get a mutable reference to the specified animation, if it exists
-	pub fn get_anim_mut(&mut self, handle: &AnimHandle) -> Option<&mut Anim> {
+	pub fn get_anim_mut(
+		&mut self, 
+		handle: &AnimHandle
+	) -> Result<&mut Anim, ()> {
 		if self.anims.len() > handle.index {
-			Some(&mut self.anims[handle.index])
+			Ok(&mut self.anims[handle.index])
 		}
 		else{
-			None
+			Err(())
 		}
 	}
 }

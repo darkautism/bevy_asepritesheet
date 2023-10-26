@@ -62,8 +62,8 @@ impl SpriteAnimator {
 		
 		// return 0 if no animation
 		let cur_anim = 
-			if let Some(val) = self.cur_anim.as_ref() { 
-				if let Some(val2) = self.spritesheet.get_anim(val) { val2 } 
+			if let Some(handle) = self.cur_anim.as_ref() { 
+				if let Ok(val) = self.spritesheet.get_anim(handle) { val } 
 				else { return 0.0; }
 			} 
 			else { return 0.0; };
@@ -142,7 +142,7 @@ impl SpriteAnimator {
 	/// if the specified animation handle does not refer to an animation within
 	/// the spritesheet
 	pub fn set_anim(&mut self, anim: sprite::AnimHandle) -> Result<(), ()> {
-		if self.spritesheet.get_anim(&anim).is_none() { 
+		if self.spritesheet.get_anim(&anim).is_err() { 
 			return Err(());
 		}
 		self.reset_persistent_data();
@@ -174,7 +174,7 @@ impl SpriteAnimator {
 		// return if no animation is playing
 		let cur_anim = 
 			if let Some(val) = self.cur_anim.as_ref() { 
-				if let Some(val2) = self.spritesheet.get_anim(val) { val2 } 
+				if let Ok(val2) = self.spritesheet.get_anim(val) { val2 } 
 				else { return; }
 			} 
 			else { return; };

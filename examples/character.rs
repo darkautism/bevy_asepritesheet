@@ -60,79 +60,57 @@ enum AppState {
 // Utility: --------------------------------------------------------------------
 
 /// format the spritesheet animations for the witch character
-fn format_witch_anims(witch_sheet: &mut sprite::Sheet) -> Result<(),()> {
+fn format_witch_anims(sheet: &mut sprite::Sheet) -> Result<(),()> {
 
     // get handles for all the needed animations
-    let handle_idle = witch_sheet.get_anim_handle("idle")
-        .ok_or(())?;
-    // let handle_running = witch_sheet.get_anim_handle("running")
-    //    .ok_or(())?;
-    let handle_bow = witch_sheet.get_anim_handle("bow")
-        .ok_or(())?;
-    let handle_jump_prepare = witch_sheet.get_anim_handle("jump_prepare")
-        .ok_or(())?;
-    let handle_jump = witch_sheet.get_anim_handle("jump")
-        .ok_or(())?;
-    let handle_fall_transition = witch_sheet.get_anim_handle("fall_transition")
-        .ok_or(())?;
-    let handle_falling = witch_sheet.get_anim_handle("falling")
-        .ok_or(())?;
-    let handle_fall_land = witch_sheet.get_anim_handle("fall_land")
-        .ok_or(())?;
-    // let handle_slide = witch_sheet.get_anim_handle("slide")
-    //    .ok_or(())?;
-    let handle_attack_light = witch_sheet.get_anim_handle("attack_light")
-        .ok_or(())?;
-    let handle_attack_heavy = witch_sheet.get_anim_handle("attack_heavy")
-        .ok_or(())?;
-    let handle_damage = witch_sheet.get_anim_handle("damage")
-        .ok_or(())?;
-    // let handle_face_background = witch_sheet.get_anim_handle("face_background")
-    //    .ok_or(())?;
+    let handle_idle = sheet.get_anim_handle("idle")?;
+    // let handle_running = witch_sheet.get_anim_handle("running")?;
+    let handle_bow = sheet.get_anim_handle("bow")?;
+    let handle_jump_prepare = sheet.get_anim_handle("jump_prepare")?;
+    let handle_jump = sheet.get_anim_handle("jump")?;
+    let handle_fall_transition = sheet.get_anim_handle("fall_transition")?;
+    let handle_falling = sheet.get_anim_handle("falling")?;
+    let handle_fall_land = sheet.get_anim_handle("fall_land")?;
+    // let handle_slide = witch_sheet.get_anim_handle("slide")?;
+    let handle_attack_light = sheet.get_anim_handle("attack_light")?;
+    let handle_attack_heavy = sheet.get_anim_handle("attack_heavy")?;
+    let handle_damage = sheet.get_anim_handle("damage")?;
+    // let handle_face_background = witch_sheet.get_anim_handle("face_background")?;
 
     // have the bow animation pause at the end
-    let anim_bow = witch_sheet.get_anim_mut(&handle_bow)
-        .ok_or(())?;
+    let anim_bow = sheet.get_anim_mut(&handle_bow)?;
     anim_bow.end_action = AnimEndAction::Pause;
 
     // when the jump prepare animation finishes, play the jump animation
-    let anim_jump_prepare = witch_sheet.get_anim_mut(&handle_jump_prepare)
-        .ok_or(())?;
+    let anim_jump_prepare = sheet.get_anim_mut(&handle_jump_prepare)?;
     anim_jump_prepare.end_action = AnimEndAction::Next(handle_jump);
     
     // when the jump animation finishes, play the fall transition animation
-    let anim_jump = witch_sheet.get_anim_mut(&handle_jump)
-        .ok_or(())?;
+    let anim_jump = sheet.get_anim_mut(&handle_jump)?;
     anim_jump.end_action = AnimEndAction::Next(handle_fall_transition);
 
     // when the fall transition animation finishes, play the falling animation
-    let anim_fall_transition = witch_sheet.get_anim_mut(&handle_fall_transition)
-        .ok_or(())?;
+    let anim_fall_transition = sheet.get_anim_mut(&handle_fall_transition)?;
     anim_fall_transition.end_action = AnimEndAction::Next(handle_falling);
     
     // when the falling animation finishes, play the fall land animation
-    let anim_falling = witch_sheet.get_anim_mut(&handle_falling)
-        .ok_or(())?;
+    let anim_falling = sheet.get_anim_mut(&handle_falling)?;
     anim_falling.end_action = AnimEndAction::Next(handle_fall_land);
     
     // when the fall land animation finishes, play the idle animation
-    let anim_fall_land = witch_sheet.get_anim_mut(&handle_fall_land)
-        .ok_or(())?;
+    let anim_fall_land = sheet.get_anim_mut(&handle_fall_land)?;
     anim_fall_land.end_action = AnimEndAction::Next(handle_idle);
     
     // when the attack light animation finishes, play the idle animation
-    let anim_attack_light = witch_sheet.get_anim_mut(&handle_attack_light)
-        .ok_or(())?;
+    let anim_attack_light = sheet.get_anim_mut(&handle_attack_light)?;
     anim_attack_light.end_action = AnimEndAction::Next(handle_idle);
     
     // when the attack_heavy animation finishes, play the idle animation
-    let anim_attack_heavy = witch_sheet.get_anim_mut(&handle_attack_heavy)
-        .ok_or(())?;
+    let anim_attack_heavy = sheet.get_anim_mut(&handle_attack_heavy)?;
     anim_attack_heavy.end_action = AnimEndAction::Next(handle_idle);
     
     // when the damage animation finishes, play the idle animation
-    let anim_damage = witch_sheet.get_anim_mut(&handle_damage)
-        .ok_or(())?;
+    let anim_damage = sheet.get_anim_mut(&handle_damage)?;
     anim_damage.end_action = AnimEndAction::Next(handle_idle);
     
     Ok(())
@@ -197,7 +175,7 @@ fn load(
 
         // get a mutable ref to the spritesheet and ensure the image is loaded
         let witch_sheet = witch_data_handle.spritesheet.as_mut().unwrap();
-        if image_assets.contains(witch_sheet.img_handle()) {
+        if image_assets.contains(&witch_sheet.img_handle()) {
             println!("Image Loaded!");
 
             // set up the animations to behave properly
@@ -290,7 +268,7 @@ fn log_anim_events(
 
         // don't print the message if the animation is looping
         if let Ok(animator) = animators.get(event.entity) {
-            if let Some(anim) = animator.spritesheet().get_anim(&event.anim) {
+            if let Ok(anim) = animator.spritesheet().get_anim(&event.anim) {
                 if anim.end_action == AnimEndAction::Loop { 
                     continue; 
                 }
