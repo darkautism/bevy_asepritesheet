@@ -17,7 +17,6 @@ Key:
 ❌ - not supported  
 
 Features:  
-
 * Frame ✅ - Frame rects for each individual frame of the sprite sheet, these 
 	are parsed by the package and turned into individual frames on a 
 	TextureAtlas  
