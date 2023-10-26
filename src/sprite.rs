@@ -4,7 +4,7 @@ use std::{
 };
 use bevy::{
 	prelude::*, 
-	sprite::Anchor, reflect::Reflect
+	sprite::Anchor,
 };
 use crate::aseprite_data;
 
