@@ -60,6 +60,13 @@ Aseprite Features:
 	going to implement it, you can always reverse the frames if you want to 
 	reverse the animation  
 
+## Compatibility
+
+| bevy | bevy_asepritesheet | aseprite |
+| ---- | ---- | ---- |
+| 0.12 | 0.3 | 1.2.40 |
+| 0.11 | 0.2 | 1.2.40 |
+
 ## Usage Example
 
 First, you'll need to add the dependency to your `Cargo.toml`` file:  

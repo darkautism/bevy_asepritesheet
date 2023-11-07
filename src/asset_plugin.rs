@@ -2,7 +2,8 @@ use bevy::{
 	prelude::*, 
 	asset::{
 		AssetLoader,
-		LoadedAsset
+		io::Reader, 
+		AsyncReadExt
 	}
 };
 use serde_json::from_slice;
@@ -23,11 +24,8 @@ struct SpritesheetAssetLoader {
 impl Plugin for SpritesheetAssetPlugin {
 	fn build(&self, app: &mut App) {
 		app
-			.add_asset::<SpritesheetData>().add_asset_loader(
-				SpritesheetAssetLoader {
-        	    	extensions: self.extensions.clone()
-        		}
-			)
+			.register_asset_loader(SpritesheetAssetLoader { extensions: self.extensions.clone() })
+			.init_asset::<SpritesheetData>()
 			.add_event::<sprite_animator::AnimFinishEvent>()
         	.add_systems(PostUpdate, sprite_animator::animate_sprites)
 		;
@@ -44,17 +42,22 @@ impl SpritesheetAssetPlugin {
 
 impl AssetLoader for SpritesheetAssetLoader {
 	
+	type Asset = SpritesheetData;
+	type Settings = ();
+	type Error = std::io::Error;
+
 	fn load<'a>(
 		&'a self,
-		bytes: &'a [u8],
+		reader: &'a mut Reader,
+		settings: &'a Self::Settings,
 		load_context: &'a mut bevy::asset::LoadContext,
-	) -> bevy::utils::BoxedFuture<'a, Result<(), bevy::asset::Error>> {
-			Box::pin(async move {
-				let asset = from_slice::<SpritesheetData>(bytes)?;
-				// TODO convert to sprite::sheet?
-				load_context.set_default_asset(LoadedAsset::new(asset));
-				Ok(())
-			})
+	) -> bevy::utils::BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
+		Box::pin(async move {
+			let mut bytes = Vec::new();
+			reader.read_to_end(&mut bytes).await?;
+			let asset = from_slice::<SpritesheetData>(&bytes).expect("unable to decode sprite");
+			Ok(asset)
+		})
 	}
 
 	fn extensions(&self) -> &[&str] { &self.extensions }

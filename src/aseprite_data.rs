@@ -9,7 +9,7 @@ use bevy::{
 // Struct Definitions: ---------------------------------------------------------
 
 /// A container to hold the json data output from aseprite
-#[derive(serde::Deserialize, TypeUuid, TypePath, Debug)]
+#[derive(serde::Deserialize, TypeUuid, TypePath, Debug, Asset)]
 #[uuid = "73461c8f-e760-4fb8-8492-37d5387fca7b"]
 pub struct SpritesheetData {
     pub frames: Vec<FrameData>,

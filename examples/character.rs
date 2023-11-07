@@ -163,7 +163,7 @@ fn load(
             // create the spritesheet object and store it in the resource
             witch_data_handle.spritesheet = Some(Sheet::from_data_image(
                 &witch_data,
-                asset_server.load::<Image, _>(&witch_data.meta.image),
+                asset_server.load::<Image>(&witch_data.meta.image),
                 Anchor::Center
             ));
         }
