@@ -263,7 +263,7 @@ fn log_anim_events(
     mut events: EventReader<AnimFinishEvent>,
     animators: Query<&SpriteAnimator>
 ) {
-    for event in events.iter() {
+    for event in events.read() {
 
         // don't print the message if the animation is looping
         if let Ok(animator) = animators.get(event.entity) {
