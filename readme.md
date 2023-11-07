@@ -72,7 +72,7 @@ Aseprite Features:
 First, you'll need to add the dependency to your `Cargo.toml`` file:  
 ```toml
 [dependencies]
-bevy_aseprite = "0.2"
+bevy_aseprite = "0.3"
 ```
 
 Then, you will need to add the plugin to your bevy app:  
@@ -108,7 +108,7 @@ fn create_entity(
 	sheet_assets: Res<Assets<SpritesheetData>>,
 	mut atlas_assets: Res<Assets<TextureAtlas>>
 ) {
-	let handle = /*magically gets handle*/;
+	let handle = /*magically get handle to spritesheet asset*/;
 	if let Some(sheet_data) = sheet_assets.get(&handle) {
 		commands.spawn(
             AnimatedSpriteBundle{
