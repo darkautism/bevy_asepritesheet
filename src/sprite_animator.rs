@@ -194,6 +194,15 @@ impl SpriteAnimator {
         &self.cur_anim
     }
 
+	/// Check to see if the current animation matches the specified animation
+	pub fn is_cur_anim(&self, handle: AnimHandle) -> bool {
+		if let Some(cur_anim) = self.cur_anim {
+			cur_anim == handle
+		} else {
+			false
+		}
+	}
+
     /// Start playing the specified animation if it exists, otherwise returns empty error
     pub fn set_anim(&mut self, anim: AnimHandle) -> Result<(), ()> {
         // return err if no sheet
@@ -222,6 +231,13 @@ impl SpriteAnimator {
         self.reset_persistent_data();
         self.cur_anim = None;
     }
+
+	/// Restart the curent animation from the beginning
+	pub fn restart_anim(&mut self) {
+        self.last_anim_index = 0;
+        self.last_frame_start = 0.0;
+        self.cur_time = 0.0;
+	}
 
     /// Play and apply the animation to the specified [`TextureAtlasSprite`]
     /// over the specified elapsed time (delta)
@@ -319,9 +335,7 @@ impl SpriteAnimator {
     }
 
     fn reset_persistent_data(&mut self) {
-        self.last_anim_index = 0;
-        self.last_frame_start = 0.0;
-        self.cur_time = 0.0;
+		self.restart_anim();
     }
 }
 

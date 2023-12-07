@@ -42,7 +42,7 @@ pub struct Anim {
 
 /// A handle for [`Anim`] that can be used as a reference to play specific
 /// animations on a spritesheet
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct AnimHandle {
     index: usize,
 }

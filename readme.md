@@ -70,10 +70,17 @@ Aseprite Features:
 
 ## Changelog
 
+### 0.4.1
+
+* ✅ fix bug that caused flipped sprites to have misaligned anchors  
+* ✅ implement default for AnimHandle
+* ✅ add is_cur_anim() to SpriteAnimator for easy compare current animation
+* ✅ add restart_anim() to restart current animation of sprite animator
+
 ### 0.4.0
 
 * ✅ update examples  
-* ✅ fix oversight that makes it difficult to use `Spritesheet::from_data()`  
+* ✅ fix oversight that made difficult to use `Spritesheet::from_data()`  
 * ✅ impl default for `AnimatedSpriteBundle`  
 * ✅ impl default for `SpriteAnimator`  
 * ✅ make `SpriteAnimator` not rely on having loaded sheet when initialized  
