@@ -15,7 +15,7 @@ pub struct SpriteAnimator {
 	last_anim_index: usize
 }
 
-#[derive(Bundle)]
+#[derive(Bundle, Default)]
 pub struct AnimatedSpriteBundle {
 	pub sprite: SpriteSheetBundle,
 	pub animator: SpriteAnimator
@@ -29,8 +29,33 @@ pub struct AnimFinishEvent {
 
 // Struct Implementations: -----------------------------------------------------
 
-#[allow(dead_code)]
+impl Default for SpriteAnimator {
+	fn default() -> Self {
+		Self {
+			time_scale: 1.0,
+			spritesheet: default(),
+			cur_time: default(),
+			cur_anim: default(),
+			last_frame_start: default(),
+			last_anim_index: default()
+		}
+	}
+}
+
 impl SpriteAnimator {
+
+	/// Create a sprite animator with the specified time scale (default is 1.0, 0.5 is half 
+	/// speed, 2.0 is 2x fast forwarded animations, etc)
+	pub fn new(time_scale: f32) -> Self {
+		Self {
+			time_scale,
+			spritesheet: default(),
+			cur_time: default(),
+			cur_anim: default(),
+			last_frame_start: default(),
+			last_anim_index: default()
+		}
+	}
 
 	/// Create a sprite animator component from a given [`sprite::Sheet`]
 	pub fn from_sheet(sheet: Spritesheet) -> Self {

@@ -72,9 +72,10 @@ Aseprite Features:
 
 ### 0.4.0
 
-* ❌ impl default for `AnimatedSpriteBundle`
-* ❌ impl default for `SpriteAnimator`
-* ❌ make `SpriteAnimator` not rely on having loaded sheet when initialized  
+* ❌ update examples
+* ✅ impl default for `AnimatedSpriteBundle`
+* ✅ impl default for `SpriteAnimator`
+* ✅ make `SpriteAnimator` not rely on having loaded sheet when initialized  
 * ✅ rename `Sheet` type to `Spritesheet`  
 * ✅ general code refactors to align better with idomatic rust ideals  
 
