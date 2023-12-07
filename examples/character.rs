@@ -1,25 +1,14 @@
 // This example creates a simple bevy app that loads a character animation spritesheet and allows
-// the user to switch animations by using the number keys 0-9 and the top row letter keys Q-P. 
+// the user to switch animations by using the number keys 0-9 and the top row letter keys Q-P.
 // The spritesheet animations are set up to use some useful features such as animation transitions,
 // animation end actions, and animation events.
 
-use bevy::{
-    prelude::*,
-    sprite::Anchor, 
-    core_pipeline::clear_color::ClearColorConfig
-};
+use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*, sprite::Anchor};
 use bevy_asepritesheet::{
     aseprite_data::SpritesheetData,
     asset_plugin::SpritesheetAssetPlugin,
-    sprite::{
-        Spritesheet,
-        AnimEndAction
-    },
-    sprite_animator::{
-        SpriteAnimator,
-        AnimFinishEvent, 
-        AnimatedSpriteBundle
-    }
+    sprite::{AnimEndAction, Spritesheet},
+    sprite_animator::{AnimFinishEvent, AnimatedSpriteBundle, SpriteAnimator},
 };
 
 // Entry Point: ----------------------------------------------------------------
@@ -31,22 +20,25 @@ fn main() {
         // an animated spritesheet is complete
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
-            SpritesheetAssetPlugin::new(&["sprite.json"])
+            SpritesheetAssetPlugin::new(&["sprite.json"]),
         ))
         .add_state::<AppState>()
         .add_systems(Startup, setup)
-        .add_systems(Update, (
-            load.run_if(in_state(AppState::Loading)),
-            control_animation,
-            log_anim_events
-        ))
+        .add_systems(
+            Update,
+            (
+                load.run_if(in_state(AppState::Loading)),
+                control_animation,
+                log_anim_events,
+            ),
+        )
         .run();
 }
 
 // Struct Definitions: ---------------------------------------------------------
 
 #[derive(Resource)]
-struct SpriteDataResource{
+struct SpriteDataResource {
     entity_created: bool,
     spritesheet_data: Handle<SpritesheetData>,
     spritesheet: Option<Spritesheet>,
@@ -56,14 +48,13 @@ struct SpriteDataResource{
 enum AppState {
     #[default]
     Loading,
-    Playing
+    Playing,
 }
 
 // Utility: --------------------------------------------------------------------
 
 /// format the spritesheet animations for the witch character
-fn format_witch_anims(sheet: &mut Spritesheet) -> Result<(),()> {
-
+fn format_witch_anims(sheet: &mut Spritesheet) -> Result<(), ()> {
     // get handles for all the needed animations
     let handle_idle = sheet.get_anim_handle("idle")?;
     // let handle_running = witch_sheet.get_anim_handle("running")?;
@@ -86,7 +77,7 @@ fn format_witch_anims(sheet: &mut Spritesheet) -> Result<(),()> {
     // when the jump prepare animation finishes, play the jump animation
     let anim_jump_prepare = sheet.get_anim_mut(&handle_jump_prepare)?;
     anim_jump_prepare.end_action = AnimEndAction::Next(handle_jump);
-    
+
     // when the jump animation finishes, play the fall transition animation
     let anim_jump = sheet.get_anim_mut(&handle_jump)?;
     anim_jump.end_action = AnimEndAction::Next(handle_fall_transition);
@@ -94,45 +85,40 @@ fn format_witch_anims(sheet: &mut Spritesheet) -> Result<(),()> {
     // when the fall transition animation finishes, play the falling animation
     let anim_fall_transition = sheet.get_anim_mut(&handle_fall_transition)?;
     anim_fall_transition.end_action = AnimEndAction::Next(handle_falling);
-    
+
     // when the falling animation finishes, play the fall land animation
     let anim_falling = sheet.get_anim_mut(&handle_falling)?;
     anim_falling.end_action = AnimEndAction::Next(handle_fall_land);
-    
+
     // when the fall land animation finishes, play the idle animation
     let anim_fall_land = sheet.get_anim_mut(&handle_fall_land)?;
     anim_fall_land.end_action = AnimEndAction::Next(handle_idle);
-    
+
     // when the attack light animation finishes, play the idle animation
     let anim_attack_light = sheet.get_anim_mut(&handle_attack_light)?;
     anim_attack_light.end_action = AnimEndAction::Next(handle_idle);
-    
+
     // when the attack_heavy animation finishes, play the idle animation
     let anim_attack_heavy = sheet.get_anim_mut(&handle_attack_heavy)?;
     anim_attack_heavy.end_action = AnimEndAction::Next(handle_idle);
-    
+
     // when the damage animation finishes, play the idle animation
     let anim_damage = sheet.get_anim_mut(&handle_damage)?;
     anim_damage.end_action = AnimEndAction::Next(handle_idle);
-    
+
     Ok(())
 }
 
 // Systems: --------------------------------------------------------------------
 
 /// Initial set up system that runs at start of the game
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>
-) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // insert the resource that holds information about our spritesheet asset
-    commands.insert_resource(
-        SpriteDataResource {
-            spritesheet_data: asset_server.load("witch.sprite.json"),
-            spritesheet: None,
-            entity_created: false,
-        }
-    );
+    commands.insert_resource(SpriteDataResource {
+        spritesheet_data: asset_server.load("witch.sprite.json"),
+        spritesheet: None,
+        entity_created: false,
+    });
 
     // create the camera so we can see the sprite
     commands.spawn(Camera2dBundle {
@@ -157,11 +143,8 @@ fn load(
 ) {
     // if the witch sprite object is not yet created
     if witch_data.spritesheet.is_none() {
-
         // if the spritesheet data is loaded and parsed
-        if let Some(witch_sheet_data) = 
-            sprite_assets.get(&witch_data.spritesheet_data) 
-        {
+        if let Some(witch_sheet_data) = sprite_assets.get(&witch_data.spritesheet_data) {
             println!("Sprite Data Loaded!");
 
             // create the spritesheet
@@ -173,8 +156,7 @@ fn load(
             );
 
             // set up the animations to behave properly
-            format_witch_anims(&mut sheet)
-                .expect("ERROR: Could not format animations");
+            format_witch_anims(&mut sheet).expect("ERROR: Could not format animations");
 
             // store the spritesheet in the data resource
             witch_data.spritesheet = Some(sheet);
@@ -187,12 +169,12 @@ fn load(
             if image_assets.contains(&witch_sheet.img_handle()) {
                 println!("Image Loaded!");
                 let (mut atlas, mut anim_spr) = anim_spr_queue.single_mut();
-                
-                // apply the sprite sheet and it's texture atlas to the 
+
+                // apply the sprite sheet and it's texture atlas to the
                 // animated sprite entity
                 anim_spr.set_spritesheet(witch_sheet.clone());
                 *atlas = witch_sheet.atlas_handle().clone().unwrap();
-                
+
                 // finish the loading state of the app and move on
                 state.set(AppState::Playing);
             }
@@ -201,19 +183,17 @@ fn load(
 
     // create entity if it hasn't yet been created
     if !witch_data.entity_created {
-
         // spawn the animated sprite entity
         commands.spawn(
-
-            // use the animated sprite bundle to spawn an entity with all 
+            // use the animated sprite bundle to spawn an entity with all
             // the needed components to have an animated sprite
-            AnimatedSpriteBundle{
-                sprite: SpriteSheetBundle{
+            AnimatedSpriteBundle {
+                sprite: SpriteSheetBundle {
                     transform: Transform::from_scale(Vec3::new(4.0, 4.0, 1.0)),
                     ..Default::default()
                 },
                 ..Default::default()
-            }
+            },
         );
 
         // mark the flag so it doesn't get created twice
@@ -223,13 +203,9 @@ fn load(
 
 /// System that allows the player to select the character animation with keys
 /// 0 - 9 and q - p
-fn control_animation(
-    input: Res<Input<KeyCode>>,
-    mut query: Query<&mut SpriteAnimator>
-) {
-
+fn control_animation(input: Res<Input<KeyCode>>, mut query: Query<&mut SpriteAnimator>) {
     // get animation index from keypress
-    let mut anim_index:Option<usize> = None;
+    let mut anim_index: Option<usize> = None;
     for key in input.get_just_pressed() {
         anim_index = match key {
             KeyCode::Key0 => Some(0),
@@ -252,11 +228,15 @@ fn control_animation(
             KeyCode::I => Some(17),
             KeyCode::O => Some(18),
             KeyCode::P => Some(19),
-            _ => None
+            _ => None,
         };
-        if anim_index.is_some() { break; }
+        if anim_index.is_some() {
+            break;
+        }
     }
-    if anim_index.is_none() { return; }
+    if anim_index.is_none() {
+        return;
+    }
     let anim_index = anim_index.unwrap();
 
     // apply the animation index, or log warning if invalid index
@@ -269,18 +249,14 @@ fn control_animation(
 }
 
 /// System that handles logging a message whenever an animation finishes playing
-fn log_anim_events(
-    mut events: EventReader<AnimFinishEvent>,
-    animators: Query<&SpriteAnimator>
-) {
+fn log_anim_events(mut events: EventReader<AnimFinishEvent>, animators: Query<&SpriteAnimator>) {
     for event in events.read() {
-
         // don't print the message if the animation is looping
         if let Ok(animator) = animators.get(event.entity) {
-            if let Some(anim_sheet) = animator.spritesheet(){
+            if let Some(anim_sheet) = animator.spritesheet() {
                 if let Ok(anim) = anim_sheet.get_anim(&event.anim) {
-                    if anim.end_action == AnimEndAction::Loop { 
-                        continue; 
+                    if anim.end_action == AnimEndAction::Loop {
+                        continue;
                     }
                 }
             }
