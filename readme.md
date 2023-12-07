@@ -72,7 +72,7 @@ Aseprite Features:
 
 ### 0.4.0
 
-* ❌ update examples  
+* ✅ update examples  
 * ✅ fix oversight that makes it difficult to use `Spritesheet::from_data()`  
 * ✅ impl default for `AnimatedSpriteBundle`  
 * ✅ impl default for `SpriteAnimator`  

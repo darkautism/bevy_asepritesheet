@@ -120,7 +120,8 @@ impl Spritesheet {
 	pub fn from_data_image(
 		data: &aseprite_data::SpritesheetData, 
 		img_handle: Handle<Image>, 
-		frame_anchor: Anchor
+		frame_anchor: Anchor,
+		atlas_assets: &mut Assets<TextureAtlas>,
 	) -> Self {
 
 		// populate create a frames vec to store all frames in sprite data
@@ -197,12 +198,17 @@ impl Spritesheet {
 
 		// construct and return a spritesheet from the created animation and 
 		// frame vecs and image data
-		Spritesheet::new(
+		let mut sheet = Spritesheet::new(
 			frames,
 			anims,
 			img_handle,
 			data.meta.size.into()
-		)
+		);
+
+		// creat the atlas asset handle
+		sheet.create_atlas_handle(atlas_assets);
+
+		sheet
 	}
 
 	/// Create a spritesheet from the specified parsed aseprite json data. The
@@ -214,12 +220,14 @@ impl Spritesheet {
 	pub fn from_data(
 		data: &aseprite_data::SpritesheetData, 
 		asset_server: &Res<AssetServer>,
-		frame_anchor: Anchor
+		frame_anchor: Anchor,
+		atlas_assets: &mut Assets<TextureAtlas>,
 	) -> Self {
 		Spritesheet::from_data_image(
 			data, 
 			asset_server.load(&data.meta.image), 
-			frame_anchor
+			frame_anchor,
+			atlas_assets,
 		)
 	}
 

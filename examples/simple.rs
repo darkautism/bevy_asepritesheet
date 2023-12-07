@@ -38,17 +38,18 @@ fn create_entity(
 	// ensure the spritesheet data is loaded and retrieve it into sheet_data
 	if let Some(sheet_data) = sheet_assets.get(&sheet_hndl_res.0) {
 		// create the spritesheet instance from the spritesheet data
-		let mut sheet = Spritesheet::from_data(
+		let sheet = Spritesheet::from_data(
 			&sheet_data, 
 			&asset_server, 
 			bevy::sprite::Anchor::default(),
+			&mut atlas_assets,
 		);
 		// create entity with the animated sprite bundle and spritesheet data
 		commands.spawn(
             AnimatedSpriteBundle {
                 sprite: SpriteSheetBundle {
                     texture_atlas: 
-						sheet.create_atlas_handle(&mut atlas_assets),
+						sheet.atlas_handle().as_ref().unwrap().clone(),
                     ..Default::default()
                 },
                 animator: SpriteAnimator::from_sheet(sheet),

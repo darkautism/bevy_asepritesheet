@@ -87,6 +87,14 @@ impl SpriteAnimator {
 		}
 	}
 
+	/// Sets the spritesheet to the animator, if it already had a spritesheet the old one is 
+	/// taken and returned, wrapped in an Option<Spritesheet>, otherwise returns none.
+	/// NOTE: Remember to also update the atlas texture handle on the same entity when 
+	/// the spritesheet is changed
+	pub fn set_spritesheet(&mut self, sheet: Spritesheet) -> Option<Spritesheet> {
+		self.spritesheet.replace(sheet)
+	}
+
 	/// The current animation playtime elapsed since the animation was started
 	pub fn cur_time(&self) -> f32 { self.cur_time }
 
@@ -329,9 +337,16 @@ impl SpriteAnimator {
 pub fn animate_sprites(
 	time: Res<Time>,
 	mut events: EventWriter<AnimFinishEvent>,
-    mut query: Query<(Entity, &mut TextureAtlasSprite, &mut SpriteAnimator)>
+    mut query: Query<(
+		Entity,
+		&mut TextureAtlasSprite, 
+		&mut SpriteAnimator,
+	)>,
 ) {
     for (entity, mut sprite, mut sprite_animator) in &mut query {
+		if sprite_animator.spritesheet.is_none() {
+			continue;
+		}
         if sprite_animator.cur_anim().is_none() {
             sprite_animator.set_anim_index(1).expect("ERROR: Invalid anim");
         }

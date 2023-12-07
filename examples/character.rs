@@ -46,9 +46,10 @@ fn main() {
 // Struct Definitions: ---------------------------------------------------------
 
 #[derive(Resource)]
-struct SpriteHandleResource{
+struct SpriteDataResource{
+    entity_created: bool,
     spritesheet_data: Handle<SpritesheetData>,
-    spritesheet: Option<Spritesheet>
+    spritesheet: Option<Spritesheet>,
 }
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
@@ -126,9 +127,10 @@ fn setup(
 ) {
     // insert the resource that holds information about our spritesheet asset
     commands.insert_resource(
-        SpriteHandleResource {
+        SpriteDataResource {
             spritesheet_data: asset_server.load("witch.sprite.json"),
-            spritesheet: None
+            spritesheet: None,
+            entity_created: false,
         }
     );
 
@@ -145,70 +147,77 @@ fn setup(
 /// System that handles loading/processing assets while in 'loading' appstate
 fn load(
     mut commands: Commands,
-    mut witch_data_handle: ResMut<SpriteHandleResource>,
-    mut atlas_assets: ResMut<Assets<TextureAtlas>>,
+    mut witch_data: ResMut<SpriteDataResource>,
     sprite_assets: Res<Assets<SpritesheetData>>,
     image_assets: Res<Assets<Image>>,
+    mut atlas_assets: ResMut<Assets<TextureAtlas>>,
     asset_server: Res<AssetServer>,
     mut state: ResMut<NextState<AppState>>,
+    mut anim_spr_queue: Query<(&mut Handle<TextureAtlas>, &mut SpriteAnimator)>,
 ) {
     // if the witch sprite object is not yet created
-    if witch_data_handle.spritesheet.is_none() {
+    if witch_data.spritesheet.is_none() {
 
         // if the spritesheet data is loaded and parsed
-        if let Some(witch_data) = 
-            sprite_assets.get(&witch_data_handle.spritesheet_data) 
+        if let Some(witch_sheet_data) = 
+            sprite_assets.get(&witch_data.spritesheet_data) 
         {
             println!("Sprite Data Loaded!");
 
-            // create the spritesheet object and store it in the resource
-            witch_data_handle.spritesheet = Some(Spritesheet::from_data_image(
-                &witch_data,
-                asset_server.load::<Image>(&witch_data.meta.image),
-                Anchor::Center
-            ));
+            // create the spritesheet
+            let mut sheet = Spritesheet::from_data(
+                &witch_sheet_data,
+                &asset_server,
+                Anchor::Center,
+                &mut atlas_assets,
+            );
+
+            // set up the animations to behave properly
+            format_witch_anims(&mut sheet)
+                .expect("ERROR: Could not format animations");
+
+            // store the spritesheet in the data resource
+            witch_data.spritesheet = Some(sheet);
         }
     }
 
-    // after sprite object has been created and stored in the resource
-    else {
-
-        // get a mutable ref to the spritesheet and ensure the image is loaded
-        let witch_sheet = witch_data_handle.spritesheet.as_mut().unwrap();
-        if image_assets.contains(&witch_sheet.img_handle()) {
-            println!("Image Loaded!");
-
-            // set up the animations to behave properly
-            format_witch_anims(witch_sheet)
-                .expect("ERROR: Could not format animations");
-
-            // spawn the animated sprite entity
-            commands.spawn(
-
-                // use the animated sprite bundle to spawn an entity with all 
-                // the needed components to have an animated object from an
-                // aseprite exported file
-                AnimatedSpriteBundle{
-                    sprite: SpriteSheetBundle{
-                        texture_atlas: witch_sheet.create_atlas_handle(
-                            &mut atlas_assets
-                        ),
-                        transform: Transform::from_scale(
-                            Vec3::new(4.0, 4.0, 1.0)
-                        ),
-                        ..Default::default()
-                    },
-                    animator: SpriteAnimator::from_sheet(
-                            witch_data_handle
-                            .spritesheet
-                            .as_ref().unwrap().clone()
-                    )
-                }
-            );
-
-            // finish the loading state of the app and move on
-            state.set(AppState::Playing);
+    // after spritesheet has been created and stored in the resource
+    if witch_data.entity_created {
+        if let Some(witch_sheet) = witch_data.spritesheet.as_ref() {
+            if image_assets.contains(&witch_sheet.img_handle()) {
+                println!("Image Loaded!");
+                let (mut atlas, mut anim_spr) = anim_spr_queue.single_mut();
+                
+                // apply the sprite sheet and it's texture atlas to the 
+                // animated sprite entity
+                anim_spr.set_spritesheet(witch_sheet.clone());
+                *atlas = witch_sheet.atlas_handle().clone().unwrap();
+                
+                // finish the loading state of the app and move on
+                state.set(AppState::Playing);
+            }
         }
+    }
+
+    // create entity if it hasn't yet been created
+    if !witch_data.entity_created {
+
+        // spawn the animated sprite entity
+        commands.spawn(
+
+            // use the animated sprite bundle to spawn an entity with all 
+            // the needed components to have an animated sprite
+            AnimatedSpriteBundle{
+                sprite: SpriteSheetBundle{
+                    transform: Transform::from_scale(Vec3::new(4.0, 4.0, 1.0)),
+                    ..Default::default()
+                },
+                ..Default::default()
+            }
+        );
+
+        // mark the flag so it doesn't get created twice
+        witch_data.entity_created = true;
     }
 }
 
