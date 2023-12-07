@@ -1,3 +1,8 @@
+// This example creates a simple bevy app that loads a character animation spritesheet and allows
+// the user to switch animations by using the number keys 0-9 and the top row letter keys Q-P. 
+// The spritesheet animations are set up to use some useful features such as animation transitions,
+// animation end actions, and animation events.
+
 use bevy::{
     prelude::*,
     sprite::Anchor, 
@@ -20,9 +25,7 @@ use bevy_asepritesheet::{
 // Entry Point: ----------------------------------------------------------------
 
 fn main() {
-    let mut app = App::new();
-    app
-
+    App::new()
         // adding the SpritesheetAssetPlugin adds the asset loader to the game
         // and the AnimFinishEvent event which is sent whenever any animation
         // an animated spritesheet is complete
@@ -37,8 +40,7 @@ fn main() {
             control_animation,
             log_anim_events
         ))
-    ;
-    app.run();
+        .run();
 }
 
 // Struct Definitions: ---------------------------------------------------------
@@ -148,9 +150,8 @@ fn load(
     sprite_assets: Res<Assets<SpritesheetData>>,
     image_assets: Res<Assets<Image>>,
     asset_server: Res<AssetServer>,
-    mut state: ResMut<NextState<AppState>>
+    mut state: ResMut<NextState<AppState>>,
 ) {
-
     // if the witch sprite object is not yet created
     if witch_data_handle.spritesheet.is_none() {
 

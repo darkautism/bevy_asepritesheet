@@ -72,9 +72,10 @@ Aseprite Features:
 
 ### 0.4.0
 
-* ❌ update examples
-* ✅ impl default for `AnimatedSpriteBundle`
-* ✅ impl default for `SpriteAnimator`
+* ❌ update examples  
+* ✅ fix oversight that makes it difficult to use `Spritesheet::from_data()`  
+* ✅ impl default for `AnimatedSpriteBundle`  
+* ✅ impl default for `SpriteAnimator`  
 * ✅ make `SpriteAnimator` not rely on having loaded sheet when initialized  
 * ✅ rename `Sheet` type to `Spritesheet`  
 * ✅ general code refactors to align better with idomatic rust ideals  
@@ -94,52 +95,59 @@ bevy_aseprite = "0.4"
 Then, you will need to add the plugin to your bevy app:  
 ```rs
 use bevy::prelude::*;
-use bevy_asepritesheet::asset_plugin::SpritesheetAssetPlugin;
-use bevy_asepritesheet::sprite_animator::SpriteAnimator;
-use bevy_asepritesheet::aseprite_data::*;
-
+use bevy_asepritesheet::prelude::*;
 fn main() {
 	App::new()
-        .add_plugins((
-            DefaultPlugins.set(ImagePlugin::default_nearest()),
-            SpritesheetAssetPlugin::new(&["sprite.json"])
-        ))
+        .add_plugins((SpritesheetAssetPlugin::new(&["sprite.json"])))
+		.add_systems(Startup, setup)
+		.add_systems(Update, create_entity
+			.run_if(resource_exists::<SheetDataHandle>()))
     	.run();
 }
 ```
 
 And now you're able to load your json assets:  
 ```rs
-// assume this system has been added to the app startup schedule
-fn setup(asset_server: Res<AssetServer>) {
-	let handle = asset_server.load("witch.sprite.json");
+#[derive(Resource)]
+struct SheetDataHandle(Handle<SpritesheetData>);
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+	commands.insert_resource(
+		SpritesheetDataHandle(asset_server.load("witch.sprite.json"))
+	);
+	commands.spawn(Camera2dBundle::default());
 }
 ```
 
 Once the asset is loaded, you can create the entity from the bundle:
 ```rs
-// assume this system has been added to the app and the asset is loaded
 fn create_entity(
 	mut commands: Commands, 
+	sheet_hndl_res: Res<SpritesheetDataHandle>,
+	asset_server: Res<AssetServer>,
 	sheet_assets: Res<Assets<SpritesheetData>>,
-	mut atlas_assets: Res<Assets<TextureAtlas>>
+	mut atlas_assets: ResMut<Assets<TextureAtlas>>,
 ) {
-	let handle = /*magically get handle to spritesheet asset*/;
-	if let Some(sheet_data) = sheet_assets.get(&handle) {
+	// ensure the spritesheet data is loaded and retrieve it into sheet_data
+	if let Some(sheet_data) = sheet_assets.get(&sheet_hndl_res.0) {
+		// create the spritesheet instance from the spritesheet data
+		let mut sheet = Spritesheet::from_data(
+			&sheet_data, 
+			&asset_server, 
+			bevy::sprite::Anchor::default(),
+		);
+		// create entity with the animated sprite bundle and spritesheet data
 		commands.spawn(
-            AnimatedSpriteBundle{
-                sprite: SpriteSheetBundle{
+            AnimatedSpriteBundle {
+                sprite: SpriteSheetBundle {
                     texture_atlas: 
-						sheet_data.create_atlas_handle(&mut atlas_assets),
-                    transform: 
-						Transform::from_scale(Vec3::new(4.0, 4.0, 1.0)),
+						sheet.create_atlas_handle(&mut atlas_assets),
                     ..Default::default()
                 },
-                animator: SpriteAnimator::from_sheet(
-                    witch_data_handle.spritesheet.as_ref().unwrap().clone()
-                )
+                animator: SpriteAnimator::from_sheet(sheet),
             }
         );
+		// remove the resource so this system no longer runs
+		commands.remove_resource::<SpritesheetDataHandle>();
 	}
 }
 ```

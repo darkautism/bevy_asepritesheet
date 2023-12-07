@@ -79,16 +79,12 @@ pub struct Frame {
 #[allow(dead_code)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum AnimEndAction {
-	
 	/// Stop the animation after completion, sets current animation to [`None`]
 	Stop,
-
 	// Pause the animator after completion
 	Pause,
-
 	// Loop through the animation, restarts from the beginning upon completion
 	Loop,
-
 	// After completion, play the next specified animation
 	Next(AnimHandle)
 }
@@ -217,7 +213,7 @@ impl Spritesheet {
 	/// [`Sheet::from_data_image`] instead
 	pub fn from_data(
 		data: &aseprite_data::SpritesheetData, 
-		asset_server: AssetServer,
+		asset_server: &Res<AssetServer>,
 		frame_anchor: Anchor
 	) -> Self {
 		Spritesheet::from_data_image(
