@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::sprite;
+use crate::sprite::*;
 
 // Struct Definitions: ---------------------------------------------------------
 
@@ -8,9 +8,9 @@ use crate::sprite;
 #[derive(Component)]
 pub struct SpriteAnimator {
 	pub time_scale: f32,
-	spritesheet: sprite::Sheet,
+	spritesheet: Option<Spritesheet>,
 	cur_time: f32,
-	cur_anim: Option<sprite::AnimHandle>,
+	cur_anim: Option<AnimHandle>,
 	last_frame_start: f32,
 	last_anim_index: usize
 }
@@ -24,7 +24,7 @@ pub struct AnimatedSpriteBundle {
 #[derive(Event, Debug)]
 pub struct AnimFinishEvent {
 	pub entity: Entity,
-	pub anim: sprite::AnimHandle
+	pub anim: AnimHandle
 }
 
 // Struct Implementations: -----------------------------------------------------
@@ -33,10 +33,10 @@ pub struct AnimFinishEvent {
 impl SpriteAnimator {
 
 	/// Create a sprite animator component from a given [`sprite::Sheet`]
-	pub fn from_sheet(sheet: sprite::Sheet) -> Self {
+	pub fn from_sheet(sheet: Spritesheet) -> Self {
 		SpriteAnimator { 
 			time_scale: 1.0,
-			spritesheet: sheet,
+			spritesheet: Some(sheet),
 			cur_time: 0.0, 
 			cur_anim: None,
 			last_frame_start: 0.0,
@@ -45,11 +45,21 @@ impl SpriteAnimator {
 	}
 
 	/// Get a reference to the [`sprite::Sheet`] used by this component
-	pub fn spritesheet(&self) -> &sprite::Sheet { &self.spritesheet }
+	pub fn spritesheet(&self) -> Option<&Spritesheet> { 
+		if let Some(sheet) = &self.spritesheet {
+			Some(sheet)
+		} else {
+			None
+		}
+	}
 
 	/// Get a mutable reference to the [`sprite::Sheet`] used by this component
-	pub fn spritesheet_mut(&mut self) -> &mut sprite::Sheet { 
-		&mut self.spritesheet 
+	pub fn spritesheet_mut(&mut self) -> Option<&mut Spritesheet> {
+		if let Some(sheet) = &mut self.spritesheet {
+			Some(sheet)
+		} else {
+			None 
+		}
 	}
 
 	/// The current animation playtime elapsed since the animation was started
@@ -60,10 +70,17 @@ impl SpriteAnimator {
 	/// animation has played
 	pub fn cur_time_normalized(&self) -> f32 {
 		
+		// return if no sheet
+		let sheet = if let Some(val) = &self.spritesheet {
+			val
+		} else {
+			return 0.0;
+		};
+
 		// return 0 if no animation
 		let cur_anim = 
 			if let Some(handle) = self.cur_anim.as_ref() { 
-				if let Ok(val) = self.spritesheet.get_anim(handle) { val } 
+				if let Ok(val) = sheet.get_anim(handle) { val } 
 				else { return 0.0; }
 			} 
 			else { return 0.0; };
@@ -74,9 +91,16 @@ impl SpriteAnimator {
 	/// Set the current elapsed time in the animation
 	pub fn set_cur_time(&mut self, seconds: f32) {
 		
+		// return if no sheet
+		let sheet = if let Some(val) = &self.spritesheet {
+			val
+		} else {
+			return;
+		};
+
 		// return if no anim
 		if self.cur_anim.is_none() { return; }
-		let cur_anim = self.spritesheet.get_anim(
+		let cur_anim = sheet.get_anim(
 			self.cur_anim.as_ref().unwrap()
 		).unwrap();
 
@@ -85,7 +109,7 @@ impl SpriteAnimator {
 		// animation call
 		let mut target_time = seconds;
 		if self.cur_time > seconds {
-			if cur_anim.end_action == sprite::AnimEndAction::Loop {
+			if cur_anim.end_action == AnimEndAction::Loop {
 				let anim_time = cur_anim.total_time();
 				let loop_cur_time = self.cur_time % anim_time;
 				let loop_target_time = seconds % anim_time;
@@ -108,10 +132,10 @@ impl SpriteAnimator {
 				}
 			} else {
 				target_time = cur_anim.total_time();
-				self.last_anim_index = self.spritesheet.anim_count() - 1;
+				self.last_anim_index = sheet.anim_count() - 1;
 				self.last_frame_start = 
 					target_time - 
-					self.spritesheet.frames[self.last_anim_index].duration
+					sheet.frames[self.last_anim_index].duration
 				;
 			}
 		}
@@ -122,9 +146,16 @@ impl SpriteAnimator {
 	/// and 1 being the full length of the animation
 	pub fn set_cur_time_normalized(&mut self, time_normalized: f32) {
 
+		// return if no sheet
+		let sheet = if let Some(val) = &self.spritesheet {
+			val
+		} else {
+			return;
+		};
+
 		// return if no anim
 		if self.cur_anim.is_none() { return; }
-		let cur_anim = self.spritesheet.get_anim(
+		let cur_anim = sheet.get_anim(
 			self.cur_anim.as_ref().unwrap()
 		).unwrap();
 
@@ -134,15 +165,19 @@ impl SpriteAnimator {
 	}
 
 	/// A handle to the currently playing animation if there is one
-	pub fn cur_anim(&self) -> &Option<sprite::AnimHandle> { &self.cur_anim }
+	pub fn cur_anim(&self) -> &Option<AnimHandle> { &self.cur_anim }
 
-	/// Start playing the specified animation if it exists
-	/// 
-	/// # Panics
-	/// if the specified animation handle does not refer to an animation within
-	/// the spritesheet
-	pub fn set_anim(&mut self, anim: sprite::AnimHandle) -> Result<(), ()> {
-		if self.spritesheet.get_anim(&anim).is_err() { 
+	/// Start playing the specified animation if it exists, otherwise returns empty error
+	pub fn set_anim(&mut self, anim: AnimHandle) -> Result<(), ()> {
+		
+		// return err if no sheet
+		let sheet = if let Some(val) = &self.spritesheet {
+			val
+		} else {
+			return Err(());
+		};
+
+		if sheet.get_anim(&anim).is_err() { 
 			return Err(());
 		}
 		self.reset_persistent_data();
@@ -152,7 +187,7 @@ impl SpriteAnimator {
 
 	/// Start playing the animation at the specified index
 	pub fn set_anim_index(&mut self, anim_index: usize) -> Result<(), ()> {
-		self.set_anim(sprite::AnimHandle::from_index(anim_index))?;
+		self.set_anim(AnimHandle::from_index(anim_index))?;
 		Ok(())
 	}
 
@@ -169,17 +204,24 @@ impl SpriteAnimator {
 		self_entity: &Entity,
 		sprite: &mut TextureAtlasSprite,
 		events: &mut EventWriter<AnimFinishEvent>,
-		delta: f32) {
+		delta: f32
+	) {
+		// return if no sheet
+		let sheet = if let Some(val) = &self.spritesheet {
+			val
+		} else {
+			return;
+		};
 
 		// return if no animation is playing
 		let cur_anim = 
 			if let Some(val) = self.cur_anim.as_ref() { 
-				if let Ok(val2) = self.spritesheet.get_anim(val) { val2 } 
+				if let Ok(val2) = sheet.get_anim(val) { val2 } 
 				else { return; }
 			} 
 			else { return; };
 
-		let frames =  &self.spritesheet.frames;
+		let frames =  &sheet.frames;
 		let anim_frame_indices = cur_anim.frame_indices();
 
 		let mut cur_frame = &frames[anim_frame_indices[self.last_anim_index]];
@@ -199,12 +241,12 @@ impl SpriteAnimator {
 			if self.last_anim_index >= anim_len {
 				anim_ended = true;
 				match cur_anim.end_action {
-					sprite::AnimEndAction::Loop => {
+					AnimEndAction::Loop => {
 						self.last_anim_index %= anim_len;
 					},
-					sprite::AnimEndAction::Pause | 
-					sprite::AnimEndAction::Stop |
-					sprite::AnimEndAction::Next(_) => {
+					AnimEndAction::Pause | 
+					AnimEndAction::Stop |
+					AnimEndAction::Next(_) => {
 						self.cur_time = cur_anim.total_time();
 						self.last_anim_index = anim_len - 1;
 						cur_frame = &frames[
@@ -234,13 +276,13 @@ impl SpriteAnimator {
 
 			// act according to end action type
 			match cur_anim.end_action {
-				sprite::AnimEndAction::Pause => {
+				AnimEndAction::Pause => {
 					self.time_scale = 0.0;
 				},
-				sprite::AnimEndAction::Stop => {
+				AnimEndAction::Stop => {
 					self.stop_anim();
 				},
-				sprite::AnimEndAction::Next(anim) => {
+				AnimEndAction::Next(anim) => {
 					self.set_anim(anim).expect(
 						"ERROR: Failed to set specified animation"
 					);

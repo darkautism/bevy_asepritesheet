@@ -7,7 +7,7 @@ use bevy_asepritesheet::{
     aseprite_data::SpritesheetData,
     asset_plugin::SpritesheetAssetPlugin,
     sprite::{
-        Sheet,
+        Spritesheet,
         AnimEndAction
     },
     sprite_animator::{
@@ -46,7 +46,7 @@ fn main() {
 #[derive(Resource)]
 struct SpriteHandleResource{
     spritesheet_data: Handle<SpritesheetData>,
-    spritesheet: Option<Sheet>
+    spritesheet: Option<Spritesheet>
 }
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
@@ -59,7 +59,7 @@ enum AppState {
 // Utility: --------------------------------------------------------------------
 
 /// format the spritesheet animations for the witch character
-fn format_witch_anims(sheet: &mut Sheet) -> Result<(),()> {
+fn format_witch_anims(sheet: &mut Spritesheet) -> Result<(),()> {
 
     // get handles for all the needed animations
     let handle_idle = sheet.get_anim_handle("idle")?;
@@ -161,7 +161,7 @@ fn load(
             println!("Sprite Data Loaded!");
 
             // create the spritesheet object and store it in the resource
-            witch_data_handle.spritesheet = Some(Sheet::from_data_image(
+            witch_data_handle.spritesheet = Some(Spritesheet::from_data_image(
                 &witch_data,
                 asset_server.load::<Image>(&witch_data.meta.image),
                 Anchor::Center
@@ -267,9 +267,11 @@ fn log_anim_events(
 
         // don't print the message if the animation is looping
         if let Ok(animator) = animators.get(event.entity) {
-            if let Ok(anim) = animator.spritesheet().get_anim(&event.anim) {
-                if anim.end_action == AnimEndAction::Loop { 
-                    continue; 
+            if let Some(anim_sheet) = animator.spritesheet(){
+                if let Ok(anim) = anim_sheet.get_anim(&event.anim) {
+                    if anim.end_action == AnimEndAction::Loop { 
+                        continue; 
+                    }
                 }
             }
         }

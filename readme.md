@@ -62,17 +62,32 @@ Aseprite Features:
 
 ## Compatibility
 
-| bevy | bevy_asepritesheet | aseprite |
+| bevy_asepritesheet | bevy | aseprite |
 | ---- | ---- | ---- |
-| 0.12 | 0.3 | 1.2.40 |
-| 0.11 | 0.2 | 1.2.40 |
+| 0.4.x | 0.12 | 1.2.40 |
+| 0.3.x | 0.12 | 1.2.40 |
+| 0.2.x | 0.11 | 1.2.40 |
+
+## Changelog
+
+### 0.4.0
+
+* ❌ impl default for `AnimatedSpriteBundle`
+* ❌ impl default for `SpriteAnimator`
+* ❌ make `SpriteAnimator` not rely on having loaded sheet when initialized  
+* ✅ rename `Sheet` type to `Spritesheet`  
+* ✅ general code refactors to align better with idomatic rust ideals  
+
+### 0.3.0
+
+* ✅ adapt asset management module to work with bevy 0.12
 
 ## Usage Example
 
 First, you'll need to add the dependency to your `Cargo.toml`` file:  
 ```toml
 [dependencies]
-bevy_aseprite = "0.3"
+bevy_aseprite = "0.4"
 ```
 
 Then, you will need to add the plugin to your bevy app:  

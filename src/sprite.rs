@@ -14,7 +14,7 @@ use crate::aseprite_data;
 /// aseprite data. Used as reference data for the 
 /// [`crate::sprite_animator::SpriteAnimator`] component
 #[derive(Default, Clone, Debug)]
-pub struct Sheet {
+pub struct Spritesheet {
 
 	/// A set of every possible frame that can be used for an animation within 
 	/// the spritesheet
@@ -96,7 +96,7 @@ pub enum AnimEndAction {
 // Struct Implementations: -----------------------------------------------------
 
 #[allow(dead_code)]
-impl Sheet {
+impl Spritesheet {
 	
 	/// Create a new spritesheet object from the specified data, should 
 	/// generally not be used unless you are generating spritesheets entirely
@@ -107,7 +107,7 @@ impl Sheet {
 		img_handle: Handle<Image>, 
 		img_size: Vec2
 	) -> Self {
-		Sheet { 
+		Spritesheet { 
 			frames: frames,
 			anims: anims, 
 			img_handle: img_handle, 
@@ -201,7 +201,7 @@ impl Sheet {
 
 		// construct and return a spritesheet from the created animation and 
 		// frame vecs and image data
-		Sheet::new(
+		Spritesheet::new(
 			frames,
 			anims,
 			img_handle,
@@ -220,7 +220,7 @@ impl Sheet {
 		asset_server: AssetServer,
 		frame_anchor: Anchor
 	) -> Self {
-		Sheet::from_data_image(
+		Spritesheet::from_data_image(
 			data, 
 			asset_server.load(&data.meta.image), 
 			frame_anchor
