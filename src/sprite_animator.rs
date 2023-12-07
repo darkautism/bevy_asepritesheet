@@ -1,5 +1,5 @@
 use crate::sprite::*;
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::Anchor};
 
 // Struct Definitions: ---------------------------------------------------------
 
@@ -287,7 +287,11 @@ impl SpriteAnimator {
 
         // apply the new sprite and anchor in the texture atlas
         sprite.index = cur_frame.atlas_index;
-        sprite.anchor = cur_frame.anchor.clone();
+        sprite.anchor = cloned_flipped_anchor(
+			cur_frame.anchor, 
+			sprite.flip_x, 
+			sprite.flip_y
+		);
 
         // behave according to the sprite end action if the animation ended
         if anim_ended {
@@ -339,4 +343,105 @@ pub fn animate_sprites(
         }
         sprite_animator.animate(&entity, &mut sprite, &mut events, time.delta_seconds());
     }
+}
+
+// Utility: --------------------------------------------------------------------
+
+pub fn cloned_flipped_anchor(
+	anchor: Anchor, 
+	flip_x: bool, 
+	flip_y: bool
+) -> Anchor {
+	match anchor {
+		Anchor::TopCenter => if flip_y {
+				Anchor::BottomCenter
+			} else {
+				anchor
+			}
+		Anchor::BottomCenter => if flip_y {
+				Anchor::TopCenter
+			} else {
+				anchor
+			}
+		Anchor::CenterLeft => if flip_x {
+				Anchor::CenterRight
+			} else {
+				anchor
+			}
+		Anchor::CenterRight => if flip_x {
+				Anchor::CenterLeft
+			} else {
+				anchor
+			}
+		Anchor::TopLeft => {
+			if flip_x {
+				if flip_y {
+					Anchor::BottomRight
+				} else {
+					Anchor::TopRight
+				}
+			}
+			else if flip_y {
+				Anchor::BottomLeft
+			}
+			else {
+				anchor
+			}
+		}
+		Anchor::TopRight => {
+			if flip_x {
+				if flip_y {
+					Anchor::BottomLeft
+				} else {
+					Anchor::TopLeft
+				}
+			}
+			else if flip_y {
+				Anchor::BottomRight
+			}
+			else {
+				anchor
+			}
+		}
+		Anchor::BottomRight => {
+			if flip_x {
+				if flip_y {
+					Anchor::TopLeft
+				} else {
+					Anchor::BottomLeft
+				}
+			}
+			else if flip_y {
+				Anchor::TopRight
+			}
+			else {
+				anchor
+			}
+		}
+		Anchor::BottomLeft => {
+			if flip_x {
+				if flip_y {
+					Anchor::TopRight
+				} else {
+					Anchor::BottomRight
+				}
+			}
+			else if flip_y {
+				Anchor::TopRight
+			}
+			else {
+				anchor
+			}
+		}
+		Anchor::Custom(mut off) => {
+			if flip_x {
+				off.x *= -1.0;
+			}
+			if flip_y {
+				off.y *= -1.0;
+			}
+			Anchor::Custom(off)
+		}
+		_ => anchor
+	}
 }
