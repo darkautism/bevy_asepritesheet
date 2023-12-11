@@ -352,7 +352,7 @@ pub fn animate_sprites(
         }
         if sprite_animator.cur_anim().is_none() {
             sprite_animator
-                .set_anim_index(1)
+                .set_anim_index(0)
                 .expect("ERROR: Invalid anim");
         }
         sprite_animator.animate(&entity, &mut sprite, &mut events, time.delta_seconds());
