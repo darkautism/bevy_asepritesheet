@@ -1,6 +1,6 @@
 [package]
 name = "bevy_asepritesheet"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 authors = ["Isaiah Smith <tteck02@gmail.com>"]
 description = "Allows use of exported asetprite sprite sheets in bevy"
