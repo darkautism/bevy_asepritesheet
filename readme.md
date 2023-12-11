@@ -70,6 +70,10 @@ Aseprite Features:
 
 ## Changelog
 
+### 0.4.2
+
+* ✅ small bugfix
+
 ### 0.4.1
 
 * ✅ fix bug that caused flipped sprites to have misaligned anchors  
