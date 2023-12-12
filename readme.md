@@ -68,33 +68,6 @@ Aseprite Features:
 | 0.3.x | 0.12 | 1.2.40 |
 | 0.2.x | 0.11 | 1.2.40 |
 
-## Changelog
-
-### 0.4.2
-
-* ✅ small bugfix
-
-### 0.4.1
-
-* ✅ fix bug that caused flipped sprites to have misaligned anchors  
-* ✅ implement default for AnimHandle
-* ✅ add is_cur_anim() to SpriteAnimator for easy compare current animation
-* ✅ add restart_anim() to restart current animation of sprite animator
-
-### 0.4.0
-
-* ✅ update examples  
-* ✅ fix oversight that made difficult to use `Spritesheet::from_data()`  
-* ✅ impl default for `AnimatedSpriteBundle`  
-* ✅ impl default for `SpriteAnimator`  
-* ✅ make `SpriteAnimator` not rely on having loaded sheet when initialized  
-* ✅ rename `Sheet` type to `Spritesheet`  
-* ✅ general code refactors to align better with idomatic rust ideals  
-
-### 0.3.0
-
-* ✅ adapt asset management module to work with bevy 0.12
-
 ## Usage Example
 
 First, you'll need to add the dependency to your `Cargo.toml`` file:  
@@ -176,3 +149,40 @@ To see the complete example, see [examples/character.rs](examples/character.rs).
 
 The asset I used is a modified version of a free assset made by Legnops  
 https://legnops.itch.io/red-hood-character
+
+## Changelog
+
+### 0.5.0
+
+* ❌ update examples
+* ❌ resource to handle animation logic
+* ❌ automatic handling of loading logic on animated sprites
+* ❌ rework how spritesheets reference texture atlas with handle
+* ❌ on spritesheet loaded event
+* ❌ on load event
+* ✅ set_anim is now less strict
+
+### 0.4.2
+
+* ✅ small bugfix
+
+### 0.4.1
+
+* ✅ fix bug that caused flipped sprites to have misaligned anchors  
+* ✅ implement default for AnimHandle
+* ✅ add is_cur_anim() to SpriteAnimator for easy compare current animation
+* ✅ add restart_anim() to restart current animation of sprite animator
+
+### 0.4.0
+
+* ✅ update examples  
+* ✅ fix oversight that made difficult to use `Spritesheet::from_data()`  
+* ✅ impl default for `AnimatedSpriteBundle`  
+* ✅ impl default for `SpriteAnimator`  
+* ✅ make `SpriteAnimator` not rely on having loaded sheet when initialized  
+* ✅ rename `Sheet` type to `Spritesheet`  
+* ✅ general code refactors to align better with idomatic rust ideals  
+
+### 0.3.0
+
+* ✅ adapt asset management module to work with bevy 0.12

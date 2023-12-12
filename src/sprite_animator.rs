@@ -203,27 +203,26 @@ impl SpriteAnimator {
 		}
 	}
 
-    /// Start playing the specified animation if it exists, otherwise returns empty error
-    pub fn set_anim(&mut self, anim: AnimHandle) -> Result<(), ()> {
+    /// Start playing the specified animation and returns true if it exists, else returns false
+    pub fn set_anim(&mut self, anim: AnimHandle) -> bool {
         // return err if no sheet
         let sheet = if let Some(val) = &self.spritesheet {
             val
         } else {
-            return Err(());
+            return false;
         };
 
         if sheet.get_anim(&anim).is_err() {
-            return Err(());
+            return false;
         }
         self.reset_persistent_data();
         self.cur_anim = Some(anim);
-        Ok(())
+        false
     }
 
-    /// Start playing the animation at the specified index
-    pub fn set_anim_index(&mut self, anim_index: usize) -> Result<(), ()> {
-        self.set_anim(AnimHandle::from_index(anim_index))?;
-        Ok(())
+    /// Start playing the animation at the specified index if it exists, else return false
+    pub fn set_anim_index(&mut self, anim_index: usize) -> bool {
+        self.set_anim(AnimHandle::from_index(anim_index))
     }
 
     /// Stop playing the animation so the animator is not playing any animation
@@ -326,8 +325,7 @@ impl SpriteAnimator {
                     self.stop_anim();
                 }
                 AnimEndAction::Next(anim) => {
-                    self.set_anim(anim)
-                        .expect("ERROR: Failed to set specified animation");
+                    self.set_anim(anim);
                 }
                 _ => {}
             }
@@ -351,9 +349,7 @@ pub fn animate_sprites(
             continue;
         }
         if sprite_animator.cur_anim().is_none() {
-            sprite_animator
-                .set_anim_index(0)
-                .expect("ERROR: Invalid anim");
+            sprite_animator.set_anim_index(0);
         }
         sprite_animator.animate(&entity, &mut sprite, &mut events, time.delta_seconds());
     }

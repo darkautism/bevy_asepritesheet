@@ -242,7 +242,7 @@ fn control_animation(input: Res<Input<KeyCode>>, mut query: Query<&mut SpriteAni
     // apply the animation index, or log warning if invalid index
     for mut sprite_animator in &mut query {
         sprite_animator.time_scale = 1.0;
-        if let Err(_) = sprite_animator.set_anim_index(anim_index) {
+        if !sprite_animator.set_anim_index(anim_index) {
             warn!("WARN: Invalid index");
         }
     }
