@@ -56,19 +56,19 @@ enum AppState {
 /// format the spritesheet animations for the witch character
 fn format_witch_anims(sheet: &mut Spritesheet) -> Result<(), ()> {
     // get handles for all the needed animations
-    let handle_idle = sheet.get_anim_handle("idle")?;
-    // let handle_running = witch_sheet.get_anim_handle("running")?;
-    let handle_bow = sheet.get_anim_handle("bow")?;
-    let handle_jump_prepare = sheet.get_anim_handle("jump_prepare")?;
-    let handle_jump = sheet.get_anim_handle("jump")?;
-    let handle_fall_transition = sheet.get_anim_handle("fall_transition")?;
-    let handle_falling = sheet.get_anim_handle("falling")?;
-    let handle_fall_land = sheet.get_anim_handle("fall_land")?;
-    // let handle_slide = witch_sheet.get_anim_handle("slide")?;
-    let handle_attack_light = sheet.get_anim_handle("attack_light")?;
-    let handle_attack_heavy = sheet.get_anim_handle("attack_heavy")?;
-    let handle_damage = sheet.get_anim_handle("damage")?;
-    // let handle_face_background = witch_sheet.get_anim_handle("face_background")?;
+    let handle_idle = sheet.get_anim_handle("idle");
+    let _handle_running = sheet.get_anim_handle("running");
+    let handle_bow = sheet.get_anim_handle("bow");
+    let handle_jump_prepare = sheet.get_anim_handle("jump_prepare");
+    let handle_jump = sheet.get_anim_handle("jump");
+    let handle_fall_transition = sheet.get_anim_handle("fall_transition");
+    let handle_falling = sheet.get_anim_handle("falling");
+    let handle_fall_land = sheet.get_anim_handle("fall_land");
+    let _handle_slide = sheet.get_anim_handle("slide");
+    let handle_attack_light = sheet.get_anim_handle("attack_light");
+    let handle_attack_heavy = sheet.get_anim_handle("attack_heavy");
+    let handle_damage = sheet.get_anim_handle("damage");
+    let _handle_face_background = sheet.get_anim_handle("face_background");
 
     // have the bow animation pause at the end
     let anim_bow = sheet.get_anim_mut(&handle_bow)?;
@@ -151,7 +151,7 @@ fn load(
             let mut sheet = Spritesheet::from_data(
                 &witch_sheet_data,
                 &asset_server,
-                Anchor::Center,
+                &Anchor::Center,
                 &mut atlas_assets,
             );
 

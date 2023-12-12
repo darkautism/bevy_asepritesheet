@@ -1,6 +1,6 @@
 // This is the most basic use example from the readme.md
 
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::Anchor};
 use bevy_asepritesheet::prelude::*;
 
 fn main() {
@@ -40,7 +40,7 @@ fn create_entity(
         let sheet = Spritesheet::from_data(
             &sheet_data,
             &asset_server,
-            bevy::sprite::Anchor::default(),
+            &Anchor::default(),
             &mut atlas_assets,
         );
         // create entity with the animated sprite bundle and spritesheet data

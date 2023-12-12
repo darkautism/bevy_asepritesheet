@@ -194,14 +194,14 @@ impl SpriteAnimator {
         &self.cur_anim
     }
 
-	/// Check to see if the current animation matches the specified animation
-	pub fn is_cur_anim(&self, handle: AnimHandle) -> bool {
-		if let Some(cur_anim) = self.cur_anim {
-			cur_anim == handle
-		} else {
-			false
-		}
-	}
+    /// Check to see if the current animation matches the specified animation
+    pub fn is_cur_anim(&self, handle: AnimHandle) -> bool {
+        if let Some(cur_anim) = self.cur_anim {
+            cur_anim == handle
+        } else {
+            false
+        }
+    }
 
     /// Start playing the specified animation and returns true if it exists, else returns false
     pub fn set_anim(&mut self, anim: AnimHandle) -> bool {
@@ -231,12 +231,12 @@ impl SpriteAnimator {
         self.cur_anim = None;
     }
 
-	/// Restart the curent animation from the beginning
-	pub fn restart_anim(&mut self) {
+    /// Restart the curent animation from the beginning
+    pub fn restart_anim(&mut self) {
         self.last_anim_index = 0;
         self.last_frame_start = 0.0;
         self.cur_time = 0.0;
-	}
+    }
 
     /// Play and apply the animation to the specified [`TextureAtlasSprite`]
     /// over the specified elapsed time (delta)
@@ -302,11 +302,7 @@ impl SpriteAnimator {
 
         // apply the new sprite and anchor in the texture atlas
         sprite.index = cur_frame.atlas_index;
-        sprite.anchor = cloned_flipped_anchor(
-			cur_frame.anchor, 
-			sprite.flip_x, 
-			sprite.flip_y
-		);
+        sprite.anchor = cloned_flipped_anchor(cur_frame.anchor, sprite.flip_x, sprite.flip_y);
 
         // behave according to the sprite end action if the animation ended
         if anim_ended {
@@ -333,7 +329,7 @@ impl SpriteAnimator {
     }
 
     fn reset_persistent_data(&mut self) {
-		self.restart_anim();
+        self.restart_anim();
     }
 }
 
@@ -357,101 +353,97 @@ pub fn animate_sprites(
 
 // Utility: --------------------------------------------------------------------
 
-pub fn cloned_flipped_anchor(
-	anchor: Anchor, 
-	flip_x: bool, 
-	flip_y: bool
-) -> Anchor {
-	match anchor {
-		Anchor::TopCenter => if flip_y {
-				Anchor::BottomCenter
-			} else {
-				anchor
-			}
-		Anchor::BottomCenter => if flip_y {
-				Anchor::TopCenter
-			} else {
-				anchor
-			}
-		Anchor::CenterLeft => if flip_x {
-				Anchor::CenterRight
-			} else {
-				anchor
-			}
-		Anchor::CenterRight => if flip_x {
-				Anchor::CenterLeft
-			} else {
-				anchor
-			}
-		Anchor::TopLeft => {
-			if flip_x {
-				if flip_y {
-					Anchor::BottomRight
-				} else {
-					Anchor::TopRight
-				}
-			}
-			else if flip_y {
-				Anchor::BottomLeft
-			}
-			else {
-				anchor
-			}
-		}
-		Anchor::TopRight => {
-			if flip_x {
-				if flip_y {
-					Anchor::BottomLeft
-				} else {
-					Anchor::TopLeft
-				}
-			}
-			else if flip_y {
-				Anchor::BottomRight
-			}
-			else {
-				anchor
-			}
-		}
-		Anchor::BottomRight => {
-			if flip_x {
-				if flip_y {
-					Anchor::TopLeft
-				} else {
-					Anchor::BottomLeft
-				}
-			}
-			else if flip_y {
-				Anchor::TopRight
-			}
-			else {
-				anchor
-			}
-		}
-		Anchor::BottomLeft => {
-			if flip_x {
-				if flip_y {
-					Anchor::TopRight
-				} else {
-					Anchor::BottomRight
-				}
-			}
-			else if flip_y {
-				Anchor::TopRight
-			}
-			else {
-				anchor
-			}
-		}
-		Anchor::Custom(mut off) => {
-			if flip_x {
-				off.x *= -1.0;
-			}
-			if flip_y {
-				off.y *= -1.0;
-			}
-			Anchor::Custom(off)
-		}
-		_ => anchor
-	}
+pub fn cloned_flipped_anchor(anchor: Anchor, flip_x: bool, flip_y: bool) -> Anchor {
+    match anchor {
+        Anchor::TopCenter => {
+            if flip_y {
+                Anchor::BottomCenter
+            } else {
+                anchor
+            }
+        }
+        Anchor::BottomCenter => {
+            if flip_y {
+                Anchor::TopCenter
+            } else {
+                anchor
+            }
+        }
+        Anchor::CenterLeft => {
+            if flip_x {
+                Anchor::CenterRight
+            } else {
+                anchor
+            }
+        }
+        Anchor::CenterRight => {
+            if flip_x {
+                Anchor::CenterLeft
+            } else {
+                anchor
+            }
+        }
+        Anchor::TopLeft => {
+            if flip_x {
+                if flip_y {
+                    Anchor::BottomRight
+                } else {
+                    Anchor::TopRight
+                }
+            } else if flip_y {
+                Anchor::BottomLeft
+            } else {
+                anchor
+            }
+        }
+        Anchor::TopRight => {
+            if flip_x {
+                if flip_y {
+                    Anchor::BottomLeft
+                } else {
+                    Anchor::TopLeft
+                }
+            } else if flip_y {
+                Anchor::BottomRight
+            } else {
+                anchor
+            }
+        }
+        Anchor::BottomRight => {
+            if flip_x {
+                if flip_y {
+                    Anchor::TopLeft
+                } else {
+                    Anchor::BottomLeft
+                }
+            } else if flip_y {
+                Anchor::TopRight
+            } else {
+                anchor
+            }
+        }
+        Anchor::BottomLeft => {
+            if flip_x {
+                if flip_y {
+                    Anchor::TopRight
+                } else {
+                    Anchor::BottomRight
+                }
+            } else if flip_y {
+                Anchor::TopRight
+            } else {
+                anchor
+            }
+        }
+        Anchor::Custom(mut off) => {
+            if flip_x {
+                off.x *= -1.0;
+            }
+            if flip_y {
+                off.y *= -1.0;
+            }
+            Anchor::Custom(off)
+        }
+        _ => anchor,
+    }
 }

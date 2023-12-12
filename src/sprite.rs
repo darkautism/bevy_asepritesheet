@@ -1,5 +1,6 @@
 use crate::aseprite_data;
-use bevy::{prelude::*, sprite::Anchor};
+use aseprite_data::SpritesheetData;
+use bevy::{prelude::*, reflect::TypeUuid, sprite::Anchor};
 use std::{ops::*, usize};
 
 // Struct Definitions: ---------------------------------------------------------
@@ -7,7 +8,8 @@ use std::{ops::*, usize};
 /// A spritesheet object containing processed data from the deserialized
 /// aseprite data. Used as reference data for the
 /// [`crate::sprite_animator::SpriteAnimator`] component
-#[derive(Default, Clone, Debug)]
+#[derive(Asset, TypeUuid, TypePath, Default, Clone, Debug)]
+#[uuid = "13361c8f-a7f0-4db8-8492-c3d5387ffa7b"]
 pub struct Spritesheet {
     /// A set of every possible frame that can be used for an animation within
     /// the spritesheet
@@ -44,7 +46,7 @@ pub struct Anim {
 /// animations on a spritesheet
 #[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct AnimHandle {
-    index: usize,
+    index: Option<usize>,
 }
 
 /// An animation frame, a single atomic piece of an animation, that holds
@@ -108,11 +110,44 @@ impl Spritesheet {
     /// are NOT relative to the json file, they are relative to the bevy asset
     /// directory
     pub fn from_data_image(
-        data: &aseprite_data::SpritesheetData,
+        data: &SpritesheetData,
         img_handle: Handle<Image>,
-        frame_anchor: Anchor,
+        frame_anchor: &Anchor,
         atlas_assets: &mut Assets<TextureAtlas>,
     ) -> Self {
+        // construct and return a spritesheet from the data given
+        let mut sheet = Spritesheet::default();
+        sheet.copy_from(data, frame_anchor);
+        sheet.img_handle = img_handle;
+
+        // creat the atlas asset handle
+        sheet.create_atlas_handle(atlas_assets);
+
+        sheet
+    }
+
+    /// Create a spritesheet from the specified parsed aseprite json data. The
+    /// image will be loaded from the specified path in the aseprite json data
+    /// NOTE: image paths are NOT relative to the json file, they are relative
+    /// to the bevy asset directory. If you need to specify a different image
+    /// path, you can load the image asset manually and pass the handle to
+    /// [`Sheet::from_data_image`] instead
+    pub fn from_data(
+        data: &SpritesheetData,
+        asset_server: &Res<AssetServer>,
+        frame_anchor: &Anchor,
+        atlas_assets: &mut Assets<TextureAtlas>,
+    ) -> Self {
+        Spritesheet::from_data_image(
+            data,
+            asset_server.load(&data.meta.image),
+            frame_anchor,
+            atlas_assets,
+        )
+    }
+
+    /// copy all the data from the specified spritesheet data into self
+    pub fn copy_from(&mut self, data: &SpritesheetData, frame_anchor: &Anchor) {
         // populate create a frames vec to store all frames in sprite data
         let mut frames = Vec::<Frame>::new();
         for (i, frame_data) in data.frames.iter().enumerate() {
@@ -175,34 +210,21 @@ impl Spritesheet {
             anims.push(anim);
         }
 
-        // construct and return a spritesheet from the created animation and
-        // frame vecs and image data
-        let mut sheet = Spritesheet::new(frames, anims, img_handle, data.meta.size.into());
-
-        // creat the atlas asset handle
-        sheet.create_atlas_handle(atlas_assets);
-
-        sheet
+        self.frames = frames;
+        self.anims = anims;
+        self.img_size = data.meta.size.into();
     }
 
-    /// Create a spritesheet from the specified parsed aseprite json data. The
-    /// image will be loaded from the specified path in the aseprite json data
-    /// NOTE: image paths are NOT relative to the json file, they are relative
-    /// to the bevy asset directory. If you need to specify a different image
-    /// path, you can load the image asset manually and pass the handle to
-    /// [`Sheet::from_data_image`] instead
-    pub fn from_data(
-        data: &aseprite_data::SpritesheetData,
+    /// copy all the data from the specified spritesheet data into self + load and use the image
+    /// specified in the spritesheet data
+    pub fn copy_from_with_image(
+        &mut self,
+        data: &SpritesheetData,
+        frame_anchor: &Anchor,
         asset_server: &Res<AssetServer>,
-        frame_anchor: Anchor,
-        atlas_assets: &mut Assets<TextureAtlas>,
-    ) -> Self {
-        Spritesheet::from_data_image(
-            data,
-            asset_server.load(&data.meta.image),
-            frame_anchor,
-            atlas_assets,
-        )
+    ) {
+        self.copy_from(data, frame_anchor);
+        self.img_handle = asset_server.load(&data.meta.image);
     }
 
     /// Get the image handle that the spritesheet is using
@@ -248,19 +270,23 @@ impl Spritesheet {
     }
 
     /// Get a handle to the animation with the specified name, if it exists
-    pub fn get_anim_handle<T: AsRef<str>>(&self, name: T) -> Result<AnimHandle, ()> {
+    pub fn get_anim_handle<T: AsRef<str>>(&self, name: T) -> AnimHandle {
         for (i, anim) in self.anims.iter().enumerate() {
             if anim.name == name.as_ref() {
-                return Ok(AnimHandle { index: i });
+                return AnimHandle::from_index(i);
             }
         }
-        Err(())
+        AnimHandle::invalid()
     }
 
     /// Get a reference to the specified animation, if it exists
     pub fn get_anim(&self, handle: &AnimHandle) -> Result<&Anim, ()> {
-        if self.anims.len() > handle.index {
-            Ok(&self.anims[handle.index])
+        if !handle.is_valid() {
+            return Err(());
+        }
+        let index = handle.index.unwrap();
+        if self.anims.len() > index {
+            Ok(&self.anims[index])
         } else {
             Err(())
         }
@@ -268,8 +294,12 @@ impl Spritesheet {
 
     /// Get a mutable reference to the specified animation, if it exists
     pub fn get_anim_mut(&mut self, handle: &AnimHandle) -> Result<&mut Anim, ()> {
-        if self.anims.len() > handle.index {
-            Ok(&mut self.anims[handle.index])
+        if !handle.is_valid() {
+            return Err(());
+        }
+        let index = handle.index.unwrap();
+        if self.anims.len() > index {
+            Ok(&mut self.anims[index])
         } else {
             Err(())
         }
@@ -304,6 +334,17 @@ impl AnimHandle {
     /// Create an animation handle that refers to an animation of the specified
     /// index on any spritesheet
     pub fn from_index(index: usize) -> Self {
-        AnimHandle { index }
+        AnimHandle { index: Some(index) }
+    }
+
+    /// Create an invalid handle
+    pub fn invalid() -> Self {
+        AnimHandle { index: None }
+    }
+
+    /// Whether or not the handle is valid. NOTE just because it's valid does not mean that the
+    /// animation exists when it's used to retreive an animation
+    pub fn is_valid(&self) -> bool {
+        self.index.is_some()
     }
 }

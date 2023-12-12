@@ -158,8 +158,7 @@ https://legnops.itch.io/red-hood-character
 * ❌ resource to handle animation logic
 * ❌ automatic handling of loading logic on animated sprites
 * ❌ rework how spritesheets reference texture atlas with handle
-* ❌ on spritesheet loaded event
-* ❌ on load event
+* ❌ get_anim_handle is now less strict (but the handles it returns can be invalid)
 * ✅ set_anim is now less strict
 
 ### 0.4.2
