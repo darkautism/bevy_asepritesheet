@@ -76,7 +76,6 @@ impl SpriteAnimator {
     /// meaning none of the animation has played, while 1 means the entire
     /// animation has played
     pub fn get_cur_time_normalized(&self, sheet: &Spritesheet) -> f32 {
-
         // return 0 if no animation
         let cur_anim = if let Some(handle) = self.cur_anim.as_ref() {
             if let Ok(val) = sheet.get_anim(handle) {
@@ -220,8 +219,7 @@ impl SpriteAnimator {
                     self.set_cur_time_normalized(val, sheet);
                 }
             }
-        }
-        else {
+        } else {
             self.cur_time += delta * cur_anim.time_scale * self.time_scale;
         }
 
@@ -297,12 +295,19 @@ pub fn animate_sprites(
         &mut TextureAtlasSprite,
         &mut SpriteAnimator,
         &Handle<Spritesheet>,
+        &mut Handle<TextureAtlas>,
     )>,
 ) {
-    for (entity, mut sprite, mut sprite_animator, sheet_handle) in &mut query {
+    for (entity, mut sprite, mut sprite_animator, sheet_handle, mut atlas_handle) in &mut query {
         if let Some(sheet) = spritesheet_assets.get(sheet_handle) {
             if sprite_animator.cur_anim().is_none() {
                 sprite_animator.set_anim_index(0);
+            }
+            // ensure the animator is using the correct texture atlas from the entity
+            if let Some(sheet_atlas_handle) = sheet.atlas_handle() {
+                if sheet_atlas_handle != *atlas_handle {
+                    *atlas_handle = sheet_atlas_handle.clone();
+                }
             }
             sprite_animator.animate(
                 &entity,
