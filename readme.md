@@ -11,6 +11,11 @@ distinct animations based on the aseprite json data.
 
 ![Spritesheet](/assets/witch.png) ![Animation](/media/example.gif)
 
+#### Important! - Json data export from Aseprite MUST be set to "Array"
+
+![array_mode](/media/export_json_array.png)  
+If set to "Hash", it will not work!
+
 ## Features
 
 * Asset loader - asset loader can be specified to use whatever file extensions
@@ -28,11 +33,6 @@ can listen to them and define your own behavior
 another animation upon completion, all configurable through the library
 
 ### Aseprite Feature Support
-
-#### Important! - Json data export from Aseprite MUST be set to "Array"
-
-![array_mode](/media/export_json_array.png)  
-If set to "Hash", it will not work!
 
 Bevy Asepritesheet supports most features that aseprite exports as json data 
 alongside your spritesheets. Here is a list of Aseprite features that are 
