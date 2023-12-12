@@ -29,6 +29,11 @@ another animation upon completion, all configurable through the library
 
 ### Aseprite Feature Support
 
+#### Important! - You MUST export the json data from Aseprite in "Array" mode, 
+#### if set to "Hash", It will not work!
+
+![array_mode](/media/export_json_array.png)  
+
 Bevy Asepritesheet supports most features that aseprite exports as json data 
 alongside your spritesheets. Here is a list of Aseprite features that are 
 exported and whether they are supported in Bevy Asepritesheet or not:
@@ -156,7 +161,7 @@ https://legnops.itch.io/red-hood-character
 
 * ❌ update examples
 * ❌ resource to handle animation logic
-* ❌ automatic handling of loading logic on animated sprites
+* ✅ utility function load_spritesheet to automatically load related assets
 * ❌ rework how spritesheets reference texture atlas with handle
 * ❌ get_anim_handle is now less strict (but the handles it returns can be invalid)
 * ✅ set_anim is now less strict
