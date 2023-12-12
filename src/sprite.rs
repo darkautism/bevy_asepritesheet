@@ -244,11 +244,7 @@ impl Spritesheet {
 
     /// Get a reference to the texture atlas being used for the spritesheet
     pub fn atlas_handle(&self) -> Option<Handle<TextureAtlas>> {
-        if let Some(handle) = self.atlas_handle.clone() {
-            Some(handle)
-        } else {
-            None
-        }
+        self.atlas_handle.clone()
     }
 
     /// Create a texture atlas with each sprite frame on it if there isn't one

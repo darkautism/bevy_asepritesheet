@@ -45,7 +45,7 @@ fn create_entity(
         );
         // create entity with the animated sprite bundle and spritesheet data
         commands.spawn(AnimatedSpriteBundle {
-            sprite: SpriteSheetBundle {
+            sprite_bundle: SpriteSheetBundle {
                 texture_atlas: sheet.atlas_handle().as_ref().unwrap().clone(),
                 ..Default::default()
             },

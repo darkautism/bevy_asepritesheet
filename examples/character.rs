@@ -188,7 +188,7 @@ fn load(
             // use the animated sprite bundle to spawn an entity with all
             // the needed components to have an animated sprite
             AnimatedSpriteBundle {
-                sprite: SpriteSheetBundle {
+                sprite_bundle: SpriteSheetBundle {
                     transform: Transform::from_scale(Vec3::new(4.0, 4.0, 1.0)),
                     ..Default::default()
                 },

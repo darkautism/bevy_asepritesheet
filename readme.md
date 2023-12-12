@@ -162,7 +162,7 @@ https://legnops.itch.io/red-hood-character
 * ❌ update examples
 * ❌ resource to handle animation logic
 * ✅ utility function load_spritesheet to automatically load related assets
-* ❌ rework how spritesheets reference texture atlas with handle
+* ✅ rework how spritesheets are referenced from animator, now use handles
 * ❌ get_anim_handle is now less strict (but the handles it returns can be invalid)
 * ✅ set_anim is now less strict
 
