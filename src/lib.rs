@@ -6,7 +6,9 @@ pub mod sprite_animator;
 /// general purpose crate to re-export common types as a shortcut
 pub mod prelude {
     pub use crate::aseprite_data::SpritesheetData;
-    pub use crate::asset_plugin::{load_spritesheet_then, SpritesheetAssetPlugin};
+    pub use crate::asset_plugin::{
+        load_spritesheet, load_spritesheet_then, SpritesheetAssetPlugin,
+    };
     pub use crate::sprite::{AnimHandle, Spritesheet};
     pub use crate::sprite_animator::{AnimFinishEvent, AnimatedSpriteBundle, SpriteAnimator};
 }

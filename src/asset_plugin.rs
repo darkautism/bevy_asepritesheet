@@ -106,7 +106,10 @@ fn handle_spritesheet_loading(
 // Utility: -------------------------------------------------------------------
 
 /// a utility function used to load a spritesheet and optionally do some processing on it
-/// if needed. The spritesheet handle is returned
+/// if needed. The spritesheet handle is returned. The [`SpritesheetData`]
+/// asset is loaded and then a [`Spritesheet`] is automatically generated from the data. This also
+/// starts loading the [`Image`] and generates the [`TextureAtlas`]. The [`Handle<Image>`] can be
+/// found in the spritesheet
 ///
 /// # Arguments
 /// * `asset_server` the asset server from bevy that is used to load the asset from the sp
@@ -147,6 +150,35 @@ pub fn load_spritesheet_then<'a, F>(
         SpriteSheetLoader {
             on_complete: Some(on_load),
         },
+    ));
+    spr_handle
+}
+
+/// A utility function used to load a spritesheet and return the handle. The [`SpritesheetData`]
+/// asset is loaded and then a [`Spritesheet`] is automatically generated from the data. This also
+/// starts loading the [`Image`] and generates the [`TextureAtlas`]. The [`Handle<Image>`] can be
+/// found in the spritesheet
+///
+/// # Arguments
+/// * `asset_server` the asset server from bevy that is used to load the asset from the sp
+///     specified path
+/// * `path` the asset path that points to the spritesheet file
+/// * `on_load` a closure that executes when the spritesheet data has finished loading and the
+///     spritesheet is created from the data. The [`Spritesheet`] is passed in as a mutable
+///     reference so that you can modify it's animations or do whatever else you need to
+pub fn load_spritesheet<'a, F>(
+    commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    path: impl Into<AssetPath<'a>>,
+    frame_anchor: Anchor,
+) -> Handle<Spritesheet> {
+    let spr_dat_handle = asset_server.load::<SpritesheetData>(path);
+    let spr_handle = asset_server.add::<Spritesheet>(default());
+    commands.spawn((
+        spr_dat_handle.clone(),
+        spr_handle.clone(),
+        frame_anchor,
+        SpriteSheetLoader { on_complete: None },
     ));
     spr_handle
 }
