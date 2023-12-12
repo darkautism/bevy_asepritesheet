@@ -1,9 +1,11 @@
 [package]
 name = "bevy_asepritesheet"
+description = "Allow use of animated exported asetprite sprite sheets in bevy game engine"
+link = "https://crates.io/crates/bevy_asepritesheet"
+image = "asset_icon.gif"
 version = "0.5.0"
 edition = "2021"
 authors = ["Isaiah Smith <tteck02@gmail.com>"]
-description = "Allows use of exported asetprite sprite sheets in bevy"
 homepage = "https://technostalgic.tech/"
 repository = "https://gitlab.com/Technostalgic/bevy_asepritesheet"
 categories = ["game-development"]
