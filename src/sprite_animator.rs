@@ -1,4 +1,4 @@
-use crate::sprite::*;
+use crate::{sprite::*, core::SpriteAnimController};
 use bevy::{prelude::*, sprite::Anchor};
 
 // Struct Definitions: ---------------------------------------------------------
@@ -297,6 +297,7 @@ impl SpriteAnimator {
 pub fn animate_sprites(
     time: Res<Time>,
     spritesheet_assets: Res<Assets<Spritesheet>>,
+    anim_controller: Res<SpriteAnimController>,
     mut events: EventWriter<AnimFinishEvent>,
     mut query: Query<(
         Entity,
@@ -306,6 +307,10 @@ pub fn animate_sprites(
         &mut Handle<TextureAtlas>,
     )>,
 ) {
+    if !anim_controller.is_active {
+        return;
+    }
+    let time_scale = anim_controller.global_time_scale;
     for (entity, mut sprite, mut sprite_animator, sheet_handle, mut atlas_handle) in &mut query {
         if let Some(sheet) = spritesheet_assets.get(sheet_handle) {
             if sprite_animator.cur_anim().is_none() {
@@ -322,7 +327,7 @@ pub fn animate_sprites(
                 sheet,
                 &mut sprite,
                 &mut events,
-                time.delta_seconds(),
+                time.delta_seconds() * time_scale,
             );
         }
     }

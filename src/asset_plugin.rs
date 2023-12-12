@@ -1,4 +1,7 @@
-use crate::{aseprite_data::SpritesheetData, prelude::Spritesheet, sprite_animator};
+use crate::{
+    aseprite_data::SpritesheetData, core::SpriteAnimController, prelude::Spritesheet,
+    sprite_animator,
+};
 use bevy::{
     asset::{io::Reader, AssetLoader, AssetPath, AsyncReadExt},
     prelude::*,
@@ -28,6 +31,7 @@ impl Plugin for SpritesheetAssetPlugin {
         app.register_asset_loader(SpritesheetAssetLoader {
             extensions: self.extensions.clone(),
         })
+        .insert_resource(SpriteAnimController::default())
         .init_asset::<SpritesheetData>()
         .init_asset::<Spritesheet>()
         .add_event::<sprite_animator::AnimFinishEvent>()
