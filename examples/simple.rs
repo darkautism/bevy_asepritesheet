@@ -10,48 +10,25 @@ fn main() {
             SpritesheetAssetPlugin::new(&["sprite.json"]),
         ))
         .add_systems(Startup, setup)
-        .add_systems(
-            Update,
-            create_entity.run_if(resource_exists::<SpritesheetDataHandle>()),
-        )
         .run();
 }
 
-#[derive(Resource)]
-struct SpritesheetDataHandle(Handle<SpritesheetData>);
-
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.insert_resource(SpritesheetDataHandle(
-        asset_server.load("witch.sprite.json"),
-    ));
+    // spawn the camera so we can see the sprite
     commands.spawn(Camera2dBundle::default());
-}
 
-fn create_entity(
-    mut commands: Commands,
-    sheet_hndl_res: Res<SpritesheetDataHandle>,
-    asset_server: Res<AssetServer>,
-    sheet_assets: Res<Assets<SpritesheetData>>,
-    mut atlas_assets: ResMut<Assets<TextureAtlas>>,
-) {
-    // ensure the spritesheet data is loaded and retrieve it into sheet_data
-    if let Some(sheet_data) = sheet_assets.get(&sheet_hndl_res.0) {
-        // create the spritesheet instance from the spritesheet data
-        let sheet = Spritesheet::from_data(
-            &sheet_data,
-            &asset_server,
-            &Anchor::default(),
-            &mut atlas_assets,
-        );
-        // create entity with the animated sprite bundle and spritesheet data
-        commands.spawn(AnimatedSpriteBundle {
-            sprite_bundle: SpriteSheetBundle {
-                texture_atlas: sheet.atlas_handle().as_ref().unwrap().clone(),
-                ..Default::default()
-            },
-            animator: SpriteAnimator::from_sheet(sheet),
-        });
-        // remove the resource so this system no longer runs
-        commands.remove_resource::<SpritesheetDataHandle>();
-    }
+    // load the spritesheet and get it's handle
+    let sheet_handle = load_spritesheet(
+        &mut commands,
+        &asset_server,
+        "witch.sprite.json",
+        Anchor::Center,
+    );
+
+    // spawn the animated sprite
+    commands.spawn(AnimatedSpriteBundle {
+        animator: SpriteAnimator::from_anim(AnimHandle::from_index(1)),
+        spritesheet: sheet_handle,
+        ..Default::default()
+    });
 }

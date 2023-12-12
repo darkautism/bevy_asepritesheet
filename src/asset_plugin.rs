@@ -166,7 +166,7 @@ pub fn load_spritesheet_then<'a, F>(
 /// * `on_load` a closure that executes when the spritesheet data has finished loading and the
 ///     spritesheet is created from the data. The [`Spritesheet`] is passed in as a mutable
 ///     reference so that you can modify it's animations or do whatever else you need to
-pub fn load_spritesheet<'a, F>(
+pub fn load_spritesheet<'a>(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
     path: impl Into<AssetPath<'a>>,

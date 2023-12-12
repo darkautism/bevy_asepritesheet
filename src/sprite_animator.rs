@@ -67,6 +67,14 @@ impl SpriteAnimator {
         }
     }
 
+    /// Create a sprite animator from the specified animation
+    pub fn from_anim(anim_handle: AnimHandle) -> Self {
+        Self {
+            cur_anim: Some(anim_handle),
+            ..Default::default()
+        }
+    }
+
     /// The current animation playtime elapsed since the animation was started
     pub fn cur_time(&self) -> f32 {
         self.cur_time
