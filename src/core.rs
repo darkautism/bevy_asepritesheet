@@ -121,7 +121,7 @@ fn handle_spritesheet_loading(
 ///         }
 ///     });
 /// ```
-pub fn load_spritesheet_then<'a, F>(
+pub fn load_spritesheet_then<'a>(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
     path: impl Into<AssetPath<'a>>,

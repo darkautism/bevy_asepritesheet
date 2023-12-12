@@ -190,7 +190,7 @@ impl SpriteAnimator {
         self.cur_time = 0.0;
     }
 
-    /// Play and apply the animation to the specified [`TextureAtlasSprite`] over the specified 
+    /// Play and apply the animation to the specified [`TextureAtlasSprite`] over the specified
     /// elapsed time (delta)
     pub fn animate(
         &mut self,

@@ -11,5 +11,5 @@ pub mod prelude {
     pub use crate::core::{
         load_spritesheet, load_spritesheet_then, AsepritesheetPlugin, SpriteAnimController,
     };
-    pub use crate::sprite::{AnimHandle, Spritesheet, AnimEndAction};
+    pub use crate::sprite::{AnimEndAction, AnimHandle, Spritesheet};
 }
