@@ -32,7 +32,6 @@ another animation upon completion, all configurable through the library
 #### Important! - Json data export from Aseprite MUST be set to "Array"
 
 ![array_mode](/media/export_json_array.png)  
-
 If set to "Hash", it will not work!
 
 Bevy Asepritesheet supports most features that aseprite exports as json data 
