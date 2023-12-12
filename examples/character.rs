@@ -5,10 +5,10 @@
 
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*, sprite::Anchor};
 use bevy_asepritesheet::{
+    animator::{AnimFinishEvent, AnimatedSpriteBundle, SpriteAnimator},
     aseprite_data::SpritesheetData,
-    asset_plugin::SpritesheetAssetPlugin,
+    assets::AsepritesheetPlugin,
     sprite::{AnimEndAction, Spritesheet},
-    sprite_animator::{AnimFinishEvent, AnimatedSpriteBundle, SpriteAnimator},
 };
 
 // Entry Point: ----------------------------------------------------------------
@@ -20,7 +20,7 @@ fn main() {
         // an animated spritesheet is complete
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
-            SpritesheetAssetPlugin::new(&["sprite.json"]),
+            AsepritesheetPlugin::new(&["sprite.json"]),
         ))
         .add_state::<AppState>()
         .add_systems(Startup, setup)

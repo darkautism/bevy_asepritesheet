@@ -1,4 +1,4 @@
-use crate::{sprite::*, core::SpriteAnimController};
+use crate::{core::SpriteAnimController, sprite::*};
 use bevy::{prelude::*, sprite::Anchor};
 
 // Struct Definitions: ---------------------------------------------------------
