@@ -69,13 +69,14 @@ Aseprite Features:
 
 | bevy_asepritesheet | bevy | aseprite |
 | ---- | ---- | ---- |
-| 0.4.x | 0.12 | 1.2.40 |
+| 0.5.x | 0.12 | 1.3.2 |
+| 0.4.x | 0.12 | 1.3.2 |
 | 0.3.x | 0.12 | 1.2.40 |
 | 0.2.x | 0.11 | 1.2.40 |
 
 ## Usage Example
 
-First, you'll need to add the dependency to your `Cargo.toml`` file:  
+First, you'll need to add the dependency to `Cargo.toml`:  
 ```toml
 [dependencies]
 bevy_aseprite = "0.4"
@@ -86,60 +87,38 @@ Then, you will need to add the plugin to your bevy app:
 use bevy::prelude::*;
 use bevy_asepritesheet::prelude::*;
 fn main() {
-	App::new()
-        .add_plugins((SpritesheetAssetPlugin::new(&["sprite.json"])))
-		.add_systems(Startup, setup)
-		.add_systems(Update, create_entity
-			.run_if(resource_exists::<SheetDataHandle>()))
-    	.run();
+    App::new()
+        .add_plugins(( DefaultPlugins.set(ImagePlugin::default_nearest()),
+            AsepritesheetPlugin::new(&["sprite.json"]),
+        ))
+        .add_systems(Startup, setup)
+        .run();
 }
 ```
 
-And now you're able to load your json assets:  
+Then you can just load the spritesheet and spawn in an `AnimatedSpriteBundle` with the handle to 
+start animating your sprite, that's it!
 ```rs
-#[derive(Resource)]
-struct SheetDataHandle(Handle<SpritesheetData>);
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-	commands.insert_resource(
-		SpritesheetDataHandle(asset_server.load("witch.sprite.json"))
-	);
-	commands.spawn(Camera2dBundle::default());
+    // spawn the camera so we can see the sprite
+    commands.spawn(Camera2dBundle::default());
+    // load the spritesheet and get it's handle
+    let sheet_handle = load_spritesheet(
+        &mut commands,
+        &asset_server,
+        "witch.sprite.json",
+        bevy::sprite::Anchor::Center,
+    );
+    // spawn the animated sprite
+    commands.spawn(AnimatedSpriteBundle {
+        animator: SpriteAnimator::from_anim(AnimHandle::from_index(1)),
+        spritesheet: sheet_handle,
+        ..Default::default()
+    });
 }
 ```
 
-Once the asset is loaded, you can create the entity from the bundle:
-```rs
-fn create_entity(
-	mut commands: Commands, 
-	sheet_hndl_res: Res<SpritesheetDataHandle>,
-	asset_server: Res<AssetServer>,
-	sheet_assets: Res<Assets<SpritesheetData>>,
-	mut atlas_assets: ResMut<Assets<TextureAtlas>>,
-) {
-	// ensure the spritesheet data is loaded and retrieve it into sheet_data
-	if let Some(sheet_data) = sheet_assets.get(&sheet_hndl_res.0) {
-		// create the spritesheet instance from the spritesheet data
-		let mut sheet = Spritesheet::from_data(
-			&sheet_data, 
-			&asset_server, 
-			bevy::sprite::Anchor::default(),
-		);
-		// create entity with the animated sprite bundle and spritesheet data
-		commands.spawn(
-            AnimatedSpriteBundle {
-                sprite: SpriteSheetBundle {
-                    texture_atlas: 
-						sheet.create_atlas_handle(&mut atlas_assets),
-                    ..Default::default()
-                },
-                animator: SpriteAnimator::from_sheet(sheet),
-            }
-        );
-		// remove the resource so this system no longer runs
-		commands.remove_resource::<SpritesheetDataHandle>();
-	}
-}
-```
+The `AnimatedSpriteBundle` entity will remain invisible until the assets are finished loading
 
 ### Run the example
 
@@ -159,7 +138,7 @@ https://legnops.itch.io/red-hood-character
 
 ### 0.5.0
 
-* ❌ update examples
+* ✅ update examples
 * ✅ general refactors
 * ✅ resource to handle animation logic
 * ✅ utility function load_spritesheet to automatically load related assets

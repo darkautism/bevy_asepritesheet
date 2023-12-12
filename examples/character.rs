@@ -97,6 +97,15 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             clear_color: ClearColorConfig::Custom(Color::rgb(0.3, 0.3, 0.3)),
             ..Default::default()
         },
+        projection: OrthographicProjection {
+            // zoom in 4x
+            scale: 0.25,
+            // since we're not using Camera2dBundle::default() for projection, the near clipping
+            // plane resets to 0.0 if we don't make sure to set it here, which would make all the 
+            // sprites with a z-position of 0 invisible
+            near: -1000.0, 
+            ..Default::default()
+        },
         ..Default::default()
     });
 
