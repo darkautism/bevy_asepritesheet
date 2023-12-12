@@ -29,10 +29,11 @@ another animation upon completion, all configurable through the library
 
 ### Aseprite Feature Support
 
-#### Important! - You MUST export the json data from Aseprite in "Array" mode, 
-#### if set to "Hash", It will not work!
+#### Important! - Json data export from Aseprite MUST be set to "Array"
 
 ![array_mode](/media/export_json_array.png)  
+
+If set to "Hash", it will not work!
 
 Bevy Asepritesheet supports most features that aseprite exports as json data 
 alongside your spritesheets. Here is a list of Aseprite features that are 
