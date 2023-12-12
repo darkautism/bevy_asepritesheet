@@ -7,7 +7,7 @@ use bevy::{prelude::*, sprite::Anchor};
 pub enum AnimTimestamp {
     /// exactly how many seconds have passed since the start
     Seconds(f32),
-    /// a percentage (from 0 to 1) of how complete the animation is at the given timestamp.
+    /// a percentage (from 0 to 1) of how complete the animation is at the specified timestamp.
     /// a value of 0 will always be the beginning and a value of 1 will always be the very end of
     /// the animation, no matter how long or short it is
     Normalized(f32),
@@ -106,9 +106,6 @@ impl SpriteAnimator {
     /// Set the current elapsed time in the animation
     fn set_cur_time_seconds(&mut self, seconds: f32, sheet: &Spritesheet) {
         // return if no anim
-        if self.cur_anim.is_none() {
-            return;
-        }
         let cur_anim = sheet.get_anim(self.cur_anim.as_ref().unwrap()).unwrap();
 
         // some optomization in case the user inputs a high value, to avoid
@@ -144,9 +141,6 @@ impl SpriteAnimator {
     /// and 1 being the full length of the animation
     fn set_cur_time_normalized(&mut self, time_normalized: f32, sheet: &Spritesheet) {
         // return if no anim
-        if self.cur_anim.is_none() {
-            return;
-        }
         let cur_anim = sheet.get_anim(self.cur_anim.as_ref().unwrap()).unwrap();
 
         // calculate the non-normalized time and apply it
@@ -170,6 +164,11 @@ impl SpriteAnimator {
 
     /// Start playing the specified animation and returns true if it exists, else returns false
     pub fn set_anim(&mut self, anim: AnimHandle) {
+        if let Some(cur_anim) = self.cur_anim {
+            if cur_anim != anim {
+                self.restart_anim();
+            }
+        }
         self.cur_anim = Some(anim);
     }
 
