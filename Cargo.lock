@@ -364,7 +364,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_asepritesheet"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "bevy",
  "serde",
