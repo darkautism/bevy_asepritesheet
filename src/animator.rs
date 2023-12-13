@@ -205,6 +205,8 @@ impl SpriteAnimator {
             if let Ok(val2) = sheet.get_anim(val) {
                 val2
             } else {
+                warn!("Invalid animation for spritesheet!");
+                self.cur_anim = None;
                 return;
             }
         } else {
@@ -293,6 +295,8 @@ impl SpriteAnimator {
 
 // Systems: --------------------------------------------------------------------
 
+/// system that runs in the [`PostUpdate`] schedule to update all the animated spritesheets in the
+/// ecs world, some paramaters can be tweaked globally with the [`SpriteAnimController`] resource
 pub fn animate_sprites(
     time: Res<Time>,
     spritesheet_assets: Res<Assets<Spritesheet>>,
