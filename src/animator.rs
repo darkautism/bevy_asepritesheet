@@ -316,9 +316,6 @@ pub fn animate_sprites(
     let time_scale = anim_controller.global_time_scale;
     for (entity, mut sprite, mut sprite_animator, sheet_handle, mut atlas_handle) in &mut query {
         if let Some(sheet) = spritesheet_assets.get(sheet_handle) {
-            if sprite_animator.cur_anim().is_none() {
-                sprite_animator.set_anim_index(0);
-            }
             // ensure the animator is using the correct texture atlas from the entity
             if let Some(sheet_atlas_handle) = sheet.atlas_handle() {
                 if sheet_atlas_handle != *atlas_handle {

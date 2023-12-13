@@ -139,6 +139,7 @@ https://legnops.itch.io/red-hood-character
 ### 0.5.1
 
 * ❌ update examples
+* ✅ setting invalid animation now produces warning and resets cur_anim to None
 * ✅ add event for when spritesheet is finished loading
 
 ### 0.5.0
@@ -148,7 +149,7 @@ https://legnops.itch.io/red-hood-character
 * ✅ resource to handle animation logic
 * ✅ utility function load_spritesheet to automatically load related assets
 * ✅ rework how spritesheets are referenced from animator, now use handles
-* ✅ get_anim_handle is now less strict (but the handles it returns can be invalid)
+* ✅ get_anim_handle is less strict (but the handles it returns can be invalid)
 * ✅ set_anim is now less strict
 
 ### 0.4.2
