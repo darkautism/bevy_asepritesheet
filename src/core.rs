@@ -23,6 +23,8 @@ pub struct SpriteAnimController {
 pub struct SpritesheetLoadedEvent {
     /// The handle to the spritesheet that just finished loading
     pub handle: Handle<Spritesheet>,
+    /// The handle to the JSON data asset that was used to generate the spritesheet
+    pub data_handle: Handle<SpritesheetData>,
 }
 
 #[derive(Component)]
@@ -99,6 +101,7 @@ fn handle_spritesheet_loading(
                 commands.entity(ent).despawn();
                 load_event_writer.send(SpritesheetLoadedEvent {
                     handle: handle_spr.clone(),
+                    data_handle: handle_spr_dat.clone(),
                 });
             }
         }
