@@ -18,7 +18,10 @@ fn main() {
             AsepritesheetPlugin::new(&["sprite.json"]),
         ))
         .add_systems(Startup, setup)
-        .add_systems(Update, (control_animation, log_anim_events, log_load_events))
+        .add_systems(
+            Update,
+            (control_animation, log_anim_events, log_load_events),
+        )
         .run();
 }
 
@@ -206,7 +209,7 @@ fn log_load_events(
     for evt in event_reader.read() {
         let data = data_assets.get(&evt.data_handle).unwrap();
         println!(
-            "Spritesheet loaded at '{}', with {} animations and {} total frames",
+            "Spritesheet '{}' loaded, with {} animations and {} total frames",
             data.meta.image,
             data.meta.frame_tags.len(),
             data.frames.len()

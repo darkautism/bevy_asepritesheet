@@ -4,6 +4,7 @@ use bevy::{prelude::*, sprite::Anchor};
 // Struct Definitions: ---------------------------------------------------------
 
 /// Specifies a specific time within a aprite animation
+#[derive(Clone, Copy, PartialEq)]
 pub enum AnimTimestamp {
     /// exactly how many seconds have passed since the start
     Seconds(f32),
@@ -15,7 +16,7 @@ pub enum AnimTimestamp {
 
 /// A component used to animate a [`TextureAtlasSprite`], which contains a
 /// [`sprite::Sheet`] for data and reference about frames and animations
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct SpriteAnimator {
     pub time_scale: f32,
     cur_time: f32,
@@ -25,14 +26,17 @@ pub struct SpriteAnimator {
     target_time: Option<AnimTimestamp>,
 }
 
-#[derive(Bundle, Default)]
+#[derive(Bundle, Default, Clone)]
 pub struct AnimatedSpriteBundle {
     pub sprite_bundle: SpriteSheetBundle,
     pub spritesheet: Handle<Spritesheet>,
     pub animator: SpriteAnimator,
 }
 
-#[derive(Event, Debug)]
+#[derive(Component, Clone, Copy)]
+pub struct AnimEventSender;
+
+#[derive(Event, Debug, Clone)]
 pub struct AnimFinishEvent {
     pub entity: Entity,
     pub anim: AnimHandle,
@@ -194,11 +198,11 @@ impl SpriteAnimator {
     /// elapsed time (delta)
     pub fn animate(
         &mut self,
+        delta: f32,
         self_entity: &Entity,
         sheet: &Spritesheet,
         sprite: &mut TextureAtlasSprite,
-        events: &mut EventWriter<AnimFinishEvent>,
-        delta: f32,
+        maybe_evts: Option<&mut EventWriter<AnimFinishEvent>>,
     ) {
         // return if no animation is playing
         let cur_anim = if let Some(val) = self.cur_anim.as_ref() {
@@ -267,10 +271,12 @@ impl SpriteAnimator {
         // behave according to the sprite end action if the animation ended
         if anim_ended {
             // send an event letting the program know the animation finished
-            events.send(AnimFinishEvent {
-                entity: *self_entity,
-                anim: *self.cur_anim.as_ref().unwrap(),
-            });
+            if let Some(evts) = maybe_evts {
+                evts.send(AnimFinishEvent {
+                    entity: *self_entity,
+                    anim: *self.cur_anim.as_ref().unwrap(),
+                });
+            }
 
             // act according to end action type
             match cur_anim.end_action {
@@ -308,13 +314,16 @@ pub fn animate_sprites(
         &mut SpriteAnimator,
         &Handle<Spritesheet>,
         &mut Handle<TextureAtlas>,
+        Option<&AnimEventSender>,
     )>,
 ) {
     if !anim_controller.is_active {
         return;
     }
     let time_scale = anim_controller.global_time_scale;
-    for (entity, mut sprite, mut sprite_animator, sheet_handle, mut atlas_handle) in &mut query {
+    for (entity, mut sprite, mut sprite_animator, sheet_handle, mut atlas_handle, maybe_evt_send) in
+        &mut query
+    {
         if let Some(sheet) = spritesheet_assets.get(sheet_handle) {
             // ensure the animator is using the correct texture atlas from the entity
             if let Some(sheet_atlas_handle) = sheet.atlas_handle() {
@@ -322,12 +331,18 @@ pub fn animate_sprites(
                     *atlas_handle = sheet_atlas_handle.clone();
                 }
             }
+            // only pass in the event writer if the entity has the event sender component
+            let maybe_evts = if maybe_evt_send.is_some() {
+                Some(&mut events)
+            } else {
+                None
+            };
             sprite_animator.animate(
+                time.delta_seconds() * time_scale,
                 &entity,
                 sheet,
                 &mut sprite,
-                &mut events,
-                time.delta_seconds() * time_scale,
+                maybe_evts,
             );
         }
     }
