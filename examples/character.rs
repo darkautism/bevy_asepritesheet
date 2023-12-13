@@ -179,6 +179,7 @@ fn control_animation(input: Res<Input<KeyCode>>, mut query: Query<&mut SpriteAni
 }
 
 /// System that handles logging a message whenever an animation finishes playing
+/// NOTE: animation events will only be sent if an entity has the [`AnimEventSender`] component
 fn log_anim_events(
     mut events: EventReader<AnimFinishEvent>,
     spritesheet_assets: Res<Assets<Spritesheet>>,
