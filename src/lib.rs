@@ -10,6 +10,7 @@ pub mod prelude {
     pub use crate::aseprite_data::SpritesheetData;
     pub use crate::core::{
         load_spritesheet, load_spritesheet_then, AsepritesheetPlugin, SpriteAnimController,
+        SpritesheetLoadedEvent,
     };
     pub use crate::sprite::{AnimEndAction, AnimHandle, Spritesheet};
 }

@@ -101,9 +101,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             // zoom in 4x
             scale: 0.25,
             // since we're not using Camera2dBundle::default() for projection, the near clipping
-            // plane resets to 0.0 if we don't make sure to set it here, which would make all the 
+            // plane resets to 0.0 if we don't make sure to set it here, which would make all the
             // sprites with a z-position of 0 invisible
-            near: -1000.0, 
+            near: -1000.0,
             ..Default::default()
         },
         ..Default::default()
@@ -115,7 +115,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         &asset_server,
         "witch.sprite.json",
         Anchor::Center,
-        // here we can define a callback with a mutable reference to the spritesheet that was 
+        // here we can define a callback with a mutable reference to the spritesheet that was
         // loaded so that it can be tweaked after loading is complete
         |sheet| {
             println!("Spritesheet finished loading!");

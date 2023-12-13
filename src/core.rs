@@ -17,21 +17,20 @@ pub struct SpriteAnimController {
     pub global_time_scale: f32,
 }
 
+/// Event which gets fired when a spritesheet is finished loading through a [`load_spritesheet`]
+/// or similar function. Listen for it with [`EventReader<SpritesheetLoadedEvent>`]
+#[derive(Event, Debug)]
+pub struct SpritesheetLoadedEvent {
+    /// The handle to the spritesheet that just finished loading
+    pub handle: Handle<Spritesheet>,
+}
+
 #[derive(Component)]
 struct SpriteSheetLoader {
     on_complete: Option<fn(&mut Spritesheet)>,
 }
 
 // Implementations: -----------------------------------------------------------
-
-impl Default for SpriteAnimController {
-    fn default() -> Self {
-        Self {
-            is_active: true,
-            global_time_scale: 1.0,
-        }
-    }
-}
 
 impl Plugin for AsepritesheetPlugin {
     fn build(&self, app: &mut App) {
@@ -42,8 +41,18 @@ impl Plugin for AsepritesheetPlugin {
         .init_asset::<SpritesheetData>()
         .init_asset::<Spritesheet>()
         .add_event::<AnimFinishEvent>()
+        .add_event::<SpritesheetLoadedEvent>()
         .add_systems(PreUpdate, handle_spritesheet_loading)
         .add_systems(PostUpdate, animate_sprites);
+    }
+}
+
+impl Default for SpriteAnimController {
+    fn default() -> Self {
+        Self {
+            is_active: true,
+            global_time_scale: 1.0,
+        }
     }
 }
 
@@ -61,6 +70,7 @@ fn handle_spritesheet_loading(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     spritesheet_data_assets: Res<Assets<SpritesheetData>>,
+    mut load_event_writer: EventWriter<SpritesheetLoadedEvent>,
     mut spritesheet_assets: ResMut<Assets<Spritesheet>>,
     mut atlas_assets: ResMut<Assets<TextureAtlas>>,
     query: Query<(
@@ -80,11 +90,16 @@ fn handle_spritesheet_loading(
                 sheet.copy_from_with_image(spr_data, anchor, &asset_server);
                 sheet.create_atlas_handle(&mut atlas_assets);
 
-                // execute callback and destroy loader entity
+                // execute callback
                 if let Some(callback) = loader.on_complete {
                     (callback)(sheet);
                 }
+
+                // destroy loader entity and send the event signal that it's finished loading
                 commands.entity(ent).despawn();
+                load_event_writer.send(SpritesheetLoadedEvent {
+                    handle: handle_spr.clone(),
+                });
             }
         }
     }
