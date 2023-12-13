@@ -79,7 +79,7 @@ Aseprite Features:
 First, you'll need to add the dependency to `Cargo.toml`:  
 ```toml
 [dependencies]
-bevy_aseprite = "0.4"
+bevy_aseprite = "0.5"
 ```
 
 Then, you will need to add the plugin to your bevy app:  
