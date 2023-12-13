@@ -138,7 +138,8 @@ https://legnops.itch.io/red-hood-character
 
 ### 0.5.1
 
-* ❌ add event for when spritesheet is finished loading
+* ❌ update examples
+* ✅ add event for when spritesheet is finished loading
 
 ### 0.5.0
 
