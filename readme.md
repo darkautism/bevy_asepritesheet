@@ -138,7 +138,7 @@ https://legnops.itch.io/red-hood-character
 
 ### 0.5.1
 
-* ❌ update examples
+* ✅ update examples
 * ✅ setting invalid animation now produces warning and resets cur_anim to None
 * ✅ add event for when spritesheet is finished loading
 

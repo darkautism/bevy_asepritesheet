@@ -127,10 +127,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     );
 
     // create the animated sprite entity
-    commands.spawn(AnimatedSpriteBundle {
-        spritesheet: spritesheet_handle,
-        ..Default::default()
-    });
+    commands.spawn((
+        AnimEventSender, // add the event sender component so that we can capture anim events
+        AnimatedSpriteBundle {
+            spritesheet: spritesheet_handle,
+            ..Default::default()
+        }
+    ));
 }
 
 /// System that allows the player to select the character animation with keys
