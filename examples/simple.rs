@@ -7,7 +7,7 @@ fn main() {
     App::new()
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
-            AsepritesheetPlugin::new(&["sprite.json"]),
+            AsepritesheetPlugin::default(),
         ))
         .add_systems(Startup, setup)
         .run();
