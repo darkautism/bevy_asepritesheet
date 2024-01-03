@@ -66,6 +66,14 @@ impl AsepritesheetPlugin {
     }
 }
 
+impl Default for AsepritesheetPlugin {
+    fn default() -> Self {
+        Self {
+            extensions: vec!["json"],
+        }
+    }
+}
+
 // Systems: -------------------------------------------------------------------
 
 fn handle_spritesheet_loading(

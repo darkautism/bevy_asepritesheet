@@ -15,7 +15,7 @@ fn main() {
             // adding the SpritesheetAssetPlugin adds the asset loader to the game
             // and the AnimFinishEvent event which is sent whenever any animation
             // an animated spritesheet is complete
-            AsepritesheetPlugin::new(&["sprite.json"]),
+            AsepritesheetPlugin::default(),
         ))
         .add_systems(Startup, setup)
         .add_systems(
@@ -132,7 +132,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         AnimatedSpriteBundle {
             spritesheet: spritesheet_handle,
             ..Default::default()
-        }
+        },
     ));
 }
 
