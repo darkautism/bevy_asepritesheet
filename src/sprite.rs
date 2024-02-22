@@ -1,6 +1,6 @@
 use crate::aseprite_data;
 use aseprite_data::SpritesheetData;
-use bevy::{prelude::*, reflect::TypeUuid, sprite::Anchor};
+use bevy::{prelude::*, sprite::Anchor};
 use std::{ops::*, usize};
 
 // Struct Definitions: ---------------------------------------------------------
@@ -8,8 +8,8 @@ use std::{ops::*, usize};
 /// A spritesheet object containing processed data from the deserialized
 /// aseprite data. Used as reference data for the
 /// [`crate::sprite_animator::SpriteAnimator`] component
-#[derive(Asset, TypeUuid, TypePath, Default, Clone, Debug)]
-#[uuid = "13361c8f-a7f0-4db8-8492-c3d5387ffa7b"]
+#[derive(Asset, Reflect, Default, Clone, Debug)]
+// #[uuid = "13361c8f-a7f0-4db8-8492-c3d5387ffa7b"]
 pub struct Spritesheet {
     /// A set of every possible frame that can be used for an animation within
     /// the spritesheet
@@ -17,12 +17,12 @@ pub struct Spritesheet {
     anims: Vec<Anim>,
     img_handle: Handle<Image>,
     img_size: Vec2,
-    atlas_handle: Option<Handle<TextureAtlas>>,
+    atlas_handle: Option<Handle<TextureAtlasLayout>>,
 }
 
 /// A parsed spritesheet animation that determines which sprite frames will be
 /// drawn when active
-#[derive(Clone, Debug)]
+#[derive(Clone, Reflect, Debug)]
 pub struct Anim {
     /// The name of the animation that can be used to find it with
     /// [`Sheet::get_anim_handle``]
@@ -44,14 +44,14 @@ pub struct Anim {
 
 /// A handle for [`Anim`] that can be used as a reference to play specific
 /// animations on a spritesheet
-#[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Default, Clone, Reflect, Copy, Debug, PartialEq, Eq)]
 pub struct AnimHandle {
     index: Option<usize>,
 }
 
 /// An animation frame, a single atomic piece of an animation, that holds
 /// information about the sprite as it should appear when the frame is active
-#[derive(Clone, Debug)]
+#[derive(Clone, Reflect, Debug)]
 pub struct Frame {
     /// the index of the sprite frame rect on the texture atlas
     pub atlas_index: usize,
@@ -70,7 +70,7 @@ pub struct Frame {
 /// Enum for setting different end behaviors of a sprite's animation,
 /// default is [`AnimEndAction::Loop`]
 #[allow(dead_code)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Reflect, Debug, PartialEq, Eq)]
 pub enum AnimEndAction {
     /// Stop the animation after completion, sets current animation to [`None`]
     Stop,
@@ -84,7 +84,6 @@ pub enum AnimEndAction {
 
 // Struct Implementations: -----------------------------------------------------
 
-#[allow(dead_code)]
 impl Spritesheet {
     /// Create a new spritesheet object from the specified data, should
     /// generally not be used unless you are generating spritesheets entirely
@@ -113,7 +112,7 @@ impl Spritesheet {
         data: &SpritesheetData,
         img_handle: Handle<Image>,
         frame_anchor: &Anchor,
-        atlas_assets: &mut Assets<TextureAtlas>,
+        atlas_assets: &mut Assets<TextureAtlasLayout>,
     ) -> Self {
         // construct and return a spritesheet from the data given
         let mut sheet = Spritesheet::default();
@@ -136,7 +135,7 @@ impl Spritesheet {
         data: &SpritesheetData,
         asset_server: &Res<AssetServer>,
         frame_anchor: &Anchor,
-        atlas_assets: &mut Assets<TextureAtlas>,
+        atlas_assets: &mut Assets<TextureAtlasLayout>,
     ) -> Self {
         Spritesheet::from_data_image(
             data,
@@ -243,7 +242,7 @@ impl Spritesheet {
     }
 
     /// Get a reference to the texture atlas being used for the spritesheet
-    pub fn atlas_handle(&self) -> Option<Handle<TextureAtlas>> {
+    pub fn atlas_handle(&self) -> Option<Handle<TextureAtlasLayout>> {
         self.atlas_handle.clone()
     }
 
@@ -251,12 +250,12 @@ impl Spritesheet {
     /// already and return a handle to the atlas for referencing it later
     pub fn create_atlas_handle(
         &mut self,
-        atlas_assets: &mut Assets<TextureAtlas>,
-    ) -> Handle<TextureAtlas> {
+        atlas_assets: &mut Assets<TextureAtlasLayout>,
+    ) -> Handle<TextureAtlasLayout> {
         if let Some(handle) = &self.atlas_handle {
             atlas_assets.remove(handle);
         }
-        let mut atlas = TextureAtlas::new_empty(self.img_handle().clone(), self.img_size());
+        let mut atlas = TextureAtlasLayout::new_empty(self.img_size());
         for frame in &self.frames {
             atlas.add_texture(frame.rect.clone());
         }

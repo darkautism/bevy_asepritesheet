@@ -74,7 +74,7 @@ fn handle_spritesheet_loading(
     spritesheet_data_assets: Res<Assets<SpritesheetData>>,
     mut load_event_writer: EventWriter<SpritesheetLoadedEvent>,
     mut spritesheet_assets: ResMut<Assets<Spritesheet>>,
-    mut atlas_assets: ResMut<Assets<TextureAtlas>>,
+    mut atlas_assets: ResMut<Assets<TextureAtlasLayout>>,
     query: Query<(
         Entity,
         &Handle<SpritesheetData>,

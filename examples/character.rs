@@ -3,7 +3,7 @@
 // The spritesheet animations are set up to use some useful features such as animation transitions,
 // animation end actions, and animation events.
 
-use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*, sprite::Anchor};
+use bevy::{render::camera::ClearColorConfig, prelude::*, sprite::Anchor};
 use bevy_asepritesheet::prelude::*;
 
 // Entry Point: ----------------------------------------------------------------
@@ -96,7 +96,7 @@ fn format_witch_anims(sheet: &mut Spritesheet) {
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // create a camera so we can see the sprite
     commands.spawn(Camera2dBundle {
-        camera_2d: Camera2d {
+        camera: Camera{
             clear_color: ClearColorConfig::Custom(Color::rgb(0.3, 0.3, 0.3)),
             ..Default::default()
         },
@@ -138,31 +138,31 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 /// System that allows the player to select the character animation with keys
 /// 0 - 9 and q - p
-fn control_animation(input: Res<Input<KeyCode>>, mut query: Query<&mut SpriteAnimator>) {
+fn control_animation(input: Res<ButtonInput<KeyCode>>, mut query: Query<&mut SpriteAnimator>) {
     // get animation index from keypress
     let mut anim_index: Option<usize> = None;
     for key in input.get_just_pressed() {
         anim_index = match key {
-            KeyCode::Key0 => Some(0),
-            KeyCode::Key1 => Some(1),
-            KeyCode::Key2 => Some(2),
-            KeyCode::Key3 => Some(3),
-            KeyCode::Key4 => Some(4),
-            KeyCode::Key5 => Some(5),
-            KeyCode::Key6 => Some(6),
-            KeyCode::Key7 => Some(7),
-            KeyCode::Key8 => Some(8),
-            KeyCode::Key9 => Some(9),
-            KeyCode::Q => Some(10),
-            KeyCode::W => Some(11),
-            KeyCode::E => Some(12),
-            KeyCode::R => Some(13),
-            KeyCode::T => Some(14),
-            KeyCode::Y => Some(15),
-            KeyCode::U => Some(16),
-            KeyCode::I => Some(17),
-            KeyCode::O => Some(18),
-            KeyCode::P => Some(19),
+            KeyCode::Digit0 => Some(0),
+            KeyCode::Digit1 => Some(1),
+            KeyCode::Digit2 => Some(2),
+            KeyCode::Digit3 => Some(3),
+            KeyCode::Digit4 => Some(4),
+            KeyCode::Digit5 => Some(5),
+            KeyCode::Digit6 => Some(6),
+            KeyCode::Digit7 => Some(7),
+            KeyCode::Digit8 => Some(8),
+            KeyCode::Digit9 => Some(9),
+            KeyCode::KeyQ => Some(10),
+            KeyCode::KeyW => Some(11),
+            KeyCode::KeyE => Some(12),
+            KeyCode::KeyR => Some(13),
+            KeyCode::KeyT => Some(14),
+            KeyCode::KeyY => Some(15),
+            KeyCode::KeyU => Some(16),
+            KeyCode::KeyI => Some(17),
+            KeyCode::KeyO => Some(18),
+            KeyCode::KeyP => Some(19),
             _ => None,
         };
         if anim_index.is_some() {

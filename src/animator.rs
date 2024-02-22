@@ -201,7 +201,8 @@ impl SpriteAnimator {
         delta: f32,
         self_entity: &Entity,
         sheet: &Spritesheet,
-        sprite: &mut TextureAtlasSprite,
+        sprite: &mut Sprite,
+        atlas: &mut TextureAtlas,
         maybe_evts: Option<&mut EventWriter<AnimFinishEvent>>,
     ) {
         // return if no animation is playing
@@ -265,7 +266,7 @@ impl SpriteAnimator {
         }
 
         // apply the new sprite and anchor in the texture atlas
-        sprite.index = cur_frame.atlas_index;
+        atlas.index = cur_frame.atlas_index;
         sprite.anchor = cloned_flipped_anchor(cur_frame.anchor, sprite.flip_x, sprite.flip_y);
 
         // behave according to the sprite end action if the animation ended
@@ -310,10 +311,10 @@ pub fn animate_sprites(
     mut events: EventWriter<AnimFinishEvent>,
     mut query: Query<(
         Entity,
-        &mut TextureAtlasSprite,
+        &mut Sprite,
+        &mut TextureAtlas,
         &mut SpriteAnimator,
         &Handle<Spritesheet>,
-        &mut Handle<TextureAtlas>,
         Option<&AnimEventSender>,
     )>,
 ) {
@@ -321,14 +322,14 @@ pub fn animate_sprites(
         return;
     }
     let time_scale = anim_controller.global_time_scale;
-    for (entity, mut sprite, mut sprite_animator, sheet_handle, mut atlas_handle, maybe_evt_send) in
+    for (entity, mut sprite, mut atlas, mut sprite_animator, sheet_handle, maybe_evt_send) in
         &mut query
     {
         if let Some(sheet) = spritesheet_assets.get(sheet_handle) {
             // ensure the animator is using the correct texture atlas from the entity
             if let Some(sheet_atlas_handle) = sheet.atlas_handle() {
-                if sheet_atlas_handle != *atlas_handle {
-                    *atlas_handle = sheet_atlas_handle.clone();
+                if sheet_atlas_handle != atlas.layout {
+                    atlas.layout = sheet_atlas_handle.clone();
                 }
             }
             // only pass in the event writer if the entity has the event sender component
@@ -342,6 +343,7 @@ pub fn animate_sprites(
                 &entity,
                 sheet,
                 &mut sprite,
+                &mut atlas,
                 maybe_evts,
             );
         }

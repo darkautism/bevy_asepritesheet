@@ -1,21 +1,19 @@
-use bevy::{
-    prelude::*,
-    reflect::{TypePath, TypeUuid},
-};
+use bevy::prelude::*;
+use serde::Deserialize;
 
 // Struct Definitions: ---------------------------------------------------------
 
 /// A container to hold the json data output from aseprite
-#[derive(serde::Deserialize, TypeUuid, TypePath, Debug, Asset)]
-#[uuid = "73461c8f-e760-4fb8-8492-37d5387fca7b"]
+#[derive(Deserialize, Reflect, Debug, Asset)]
+// #[uuid = "73461c8f-e760-4fb8-8492-37d5387fca7b"]
 pub struct SpritesheetData {
     pub frames: Vec<FrameData>,
     pub meta: MetaData,
 }
 
 /// A container to hold some data about individual frames from the sprite sheet
-#[derive(serde::Deserialize, TypeUuid, TypePath, Debug)]
-#[uuid = "d49c70a1-177b-44ff-b427-d3929c928667"]
+#[derive(Deserialize, Reflect, Debug)]
+// #[uuid = "d49c70a1-177b-44ff-b427-d3929c928667"]
 pub struct FrameData {
     pub filename: String,
     pub frame: RectData,
@@ -29,8 +27,8 @@ pub struct FrameData {
 }
 
 /// A container to hold information about frame tags defined in aseprite
-#[derive(serde::Deserialize, TypeUuid, TypePath, Debug)]
-#[uuid = "f88c0866-6ed2-4b45-a6b6-7dcbe8c53f21"]
+#[derive(Deserialize, Reflect, Debug)]
+// #[uuid = "f88c0866-6ed2-4b45-a6b6-7dcbe8c53f21"]
 pub struct FrameTagData {
     pub name: String,
     pub from: usize,
@@ -39,8 +37,8 @@ pub struct FrameTagData {
 }
 
 /// A container to hold spritesheet metadata
-#[derive(serde::Deserialize, TypeUuid, TypePath, Debug)]
-#[uuid = "ea8ca8be-43c4-4b89-98e0-54afef524261"]
+#[derive(Deserialize, Reflect, Debug)]
+// #[uuid = "ea8ca8be-43c4-4b89-98e0-54afef524261"]
 pub struct MetaData {
     pub app: String,
     pub version: String,
@@ -54,8 +52,8 @@ pub struct MetaData {
 
 /// A container to hold size data objects used to specify 2d sizes output
 /// from aseprite
-#[derive(serde::Deserialize, TypeUuid, TypePath, Clone, Copy, Debug)]
-#[uuid = "a168bfd8-e587-4e52-89b3-58b50f6c1823"]
+#[derive(Deserialize, Reflect, Clone, Copy, Debug)]
+// #[uuid = "a168bfd8-e587-4e52-89b3-58b50f6c1823"]
 pub struct SizeData {
     pub w: u16,
     pub h: u16,
@@ -63,8 +61,8 @@ pub struct SizeData {
 
 /// A container to hold rect data objects used to specify 2d rectangles output
 /// from aseprite
-#[derive(serde::Deserialize, TypeUuid, TypePath, Clone, Copy, Debug)]
-#[uuid = "4643df56-80d8-4f49-91df-67fc95307b30"]
+#[derive(Deserialize, Reflect, Clone, Copy, Debug)]
+// #[uuid = "4643df56-80d8-4f49-91df-67fc95307b30"]
 pub struct RectData {
     pub x: u16,
     pub y: u16,
