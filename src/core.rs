@@ -2,7 +2,7 @@ use crate::{
     animator::animate_sprites,
     assets::SpritesheetAssetLoader,
     prelude::*,
-    sprite::{add_needed_atlas_handles, add_needed_img_handles, verify_spritesheet_handles},
+    sprite::{add_needed_atlas_handles, add_needed_img_handles},
 };
 use bevy::{asset::AssetPath, prelude::*, sprite::Anchor};
 
@@ -54,7 +54,6 @@ impl Plugin for AsepritesheetPlugin {
             PostUpdate,
             (
                 (
-                    verify_spritesheet_handles,
                     add_needed_atlas_handles,
                     add_needed_img_handles,
                 ),

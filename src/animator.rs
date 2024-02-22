@@ -31,6 +31,8 @@ pub struct AnimatedSpriteBundle {
     pub sprite_bundle: SpriteSheetBundle,
     pub spritesheet: Handle<Spritesheet>,
     pub animator: SpriteAnimator,
+    pub needs_img: NeedsSheetImageHandle,
+    pub needs_atlas: NeedsSheetAtlasHandle,
 }
 
 #[derive(Component, Clone, Copy)]
