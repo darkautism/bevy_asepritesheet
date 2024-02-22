@@ -69,6 +69,7 @@ Aseprite Features:
 
 | bevy_asepritesheet | bevy | aseprite |
 | ---- | ---- | ---- |
+| 0.6.x | 0.13 | 1.3.4 |
 | 0.5.x | 0.12 | 1.3.2 |
 | 0.4.x | 0.12 | 1.3.2 |
 | 0.3.x | 0.12 | 1.2.40 |
@@ -135,6 +136,13 @@ The asset I used is a modified version of a free assset made by Legnops
 https://legnops.itch.io/red-hood-character
 
 ## Changelog
+
+### 0.6.0
+
+* ✅ Support for Bevy 0.13
+* ❌ Listener for Spritesheet added to add dependent handles
+* ❌ Specify schedule for animation, or specify no animation
+* ❌ Update examples
 
 ### 0.5.1
 

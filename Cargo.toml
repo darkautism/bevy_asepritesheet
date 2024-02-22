@@ -1,7 +1,7 @@
 [package]
 name = "bevy_asepritesheet"
 description = "Allow use of animated exported asetprite sprite sheets in bevy game engine"
-version = "0.5.2"
+version = "0.6.0"
 edition = "2021"
 authors = ["Isaiah Smith <tteck02@gmail.com>"]
 homepage = "https://technostalgic.tech/"
