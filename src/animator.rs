@@ -201,10 +201,16 @@ impl SpriteAnimator {
         delta: f32,
         self_entity: &Entity,
         sheet: &Spritesheet,
+        img_handle: &mut Handle<Image>,
         sprite: &mut Sprite,
         atlas: &mut TextureAtlas,
         maybe_evts: Option<&mut EventWriter<AnimFinishEvent>>,
     ) {
+        // ensure the image handle matches the sprite
+        if *img_handle != sheet.img_handle() {
+            *img_handle = sheet.img_handle();
+        }
+        
         // return if no animation is playing
         let cur_anim = if let Some(val) = self.cur_anim.as_ref() {
             if let Ok(val2) = sheet.get_anim(val) {
@@ -315,6 +321,7 @@ pub fn animate_sprites(
         &mut TextureAtlas,
         &mut SpriteAnimator,
         &Handle<Spritesheet>,
+        &mut Handle<Image>,
         Option<&AnimEventSender>,
     )>,
 ) {
@@ -322,8 +329,15 @@ pub fn animate_sprites(
         return;
     }
     let time_scale = anim_controller.global_time_scale;
-    for (entity, mut sprite, mut atlas, mut sprite_animator, sheet_handle, maybe_evt_send) in
-        &mut query
+    for (
+        entity,
+        mut sprite,
+        mut atlas,
+        mut sprite_animator,
+        sheet_handle,
+        mut img_handle,
+        maybe_evt_send,
+    ) in &mut query
     {
         if let Some(sheet) = spritesheet_assets.get(sheet_handle) {
             // ensure the animator is using the correct texture atlas from the entity
@@ -342,6 +356,7 @@ pub fn animate_sprites(
                 time.delta_seconds() * time_scale,
                 &entity,
                 sheet,
+                &mut img_handle,
                 &mut sprite,
                 &mut atlas,
                 maybe_evts,

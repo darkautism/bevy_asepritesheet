@@ -3,7 +3,7 @@
 // The spritesheet animations are set up to use some useful features such as animation transitions,
 // animation end actions, and animation events.
 
-use bevy::{render::camera::ClearColorConfig, prelude::*, sprite::Anchor};
+use bevy::{prelude::*, render::camera::ClearColorConfig, sprite::Anchor};
 use bevy_asepritesheet::prelude::*;
 
 // Entry Point: ----------------------------------------------------------------
@@ -96,7 +96,7 @@ fn format_witch_anims(sheet: &mut Spritesheet) {
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // create a camera so we can see the sprite
     commands.spawn(Camera2dBundle {
-        camera: Camera{
+        camera: Camera {
             clear_color: ClearColorConfig::Custom(Color::rgb(0.3, 0.3, 0.3)),
             ..Default::default()
         },
@@ -132,7 +132,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         AnimatedSpriteBundle {
             spritesheet: spritesheet_handle,
             ..Default::default()
-        }
+        },
     ));
 }
 
