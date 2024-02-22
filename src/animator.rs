@@ -210,7 +210,7 @@ impl SpriteAnimator {
         if *img_handle != sheet.img_handle() {
             *img_handle = sheet.img_handle();
         }
-        
+
         // return if no animation is playing
         let cur_anim = if let Some(val) = self.cur_anim.as_ref() {
             if let Ok(val2) = sheet.get_anim(val) {

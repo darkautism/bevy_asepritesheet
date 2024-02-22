@@ -140,7 +140,7 @@ https://legnops.itch.io/red-hood-character
 ### 0.6.0
 
 * ✅ Support for Bevy 0.13
-* ❌ Listener for Spritesheet added to add dependent handles
+* ✅ Listener for Spritesheet added to add dependent handles
 * ❌ Specify schedule for animation, or specify no animation
 * ❌ Update examples
 

@@ -1,4 +1,9 @@
-use crate::{animator::animate_sprites, assets::SpritesheetAssetLoader, prelude::*};
+use crate::{
+    animator::animate_sprites,
+    assets::SpritesheetAssetLoader,
+    prelude::*,
+    sprite::{add_needed_atlas_handles, add_needed_img_handles, verify_spritesheet_handles},
+};
 use bevy::{asset::AssetPath, prelude::*, sprite::Anchor};
 
 // Structs: -------------------------------------------------------------------
@@ -45,7 +50,18 @@ impl Plugin for AsepritesheetPlugin {
         .add_event::<AnimFinishEvent>()
         .add_event::<SpritesheetLoadedEvent>()
         .add_systems(PreUpdate, handle_spritesheet_loading)
-        .add_systems(PostUpdate, animate_sprites);
+        .add_systems(
+            PostUpdate,
+            (
+                (
+                    verify_spritesheet_handles,
+                    add_needed_atlas_handles,
+                    add_needed_img_handles,
+                ),
+                animate_sprites,
+            )
+                .chain_ignore_deferred(),
+        );
     }
 }
 

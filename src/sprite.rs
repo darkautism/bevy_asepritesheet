@@ -1,6 +1,7 @@
 use crate::aseprite_data;
 use aseprite_data::SpritesheetData;
 use bevy::{prelude::*, sprite::Anchor};
+use serde::{Deserialize, Serialize};
 use std::{ops::*, usize};
 
 // Struct Definitions: ---------------------------------------------------------
@@ -341,5 +342,76 @@ impl AnimHandle {
     /// animation exists when it's used to retreive an animation
     pub fn is_valid(&self) -> bool {
         self.index.is_some()
+    }
+}
+
+// Handle Verification: --------------------------------------------------------
+
+#[derive(Component, Clone, Copy, Reflect, Debug, Serialize, Deserialize)]
+pub(crate) struct NeedsAtlasHandle;
+
+#[derive(Component, Clone, Copy, Reflect, Debug, Serialize, Deserialize)]
+pub(crate) struct NeedsImageHandle;
+
+pub(crate) fn verify_spritesheet_handles(
+    mut commands: Commands,
+    mut query: Query<
+        (Entity, &Handle<Spritesheet>, Option<&mut TextureAtlas>),
+        Added<Handle<Spritesheet>>,
+    >,
+    sheet_assets: Res<Assets<Spritesheet>>,
+) {
+    for (ent, sheet_handle, op_atlas) in &mut query {
+        let Some(sheet) = sheet_assets.get(sheet_handle) else {
+            commands
+                .entity(ent)
+                .insert((NeedsImageHandle, NeedsAtlasHandle));
+            continue;
+        };
+        commands.entity(ent).insert(sheet.img_handle.clone());
+        if let Some(sheet_atlas) = sheet.atlas_handle() {
+            if let Some(mut atlas) = op_atlas {
+                atlas.layout = sheet_atlas;
+            }
+        } else {
+            commands.entity(ent).insert(NeedsAtlasHandle);
+        }
+    }
+}
+
+pub(crate) fn add_needed_img_handles(
+    mut commands: Commands,
+    mut query: Query<(Entity, &Handle<Spritesheet>), With<NeedsImageHandle>>,
+    sheet_assets: Res<Assets<Spritesheet>>,
+) {
+    for (ent, sheet_handle) in &mut query {
+        let Some(sheet) = sheet_assets.get(sheet_handle) else {
+            continue;
+        };
+        let mut ent_cmd = commands.entity(ent);
+        ent_cmd.insert(sheet.img_handle());
+        ent_cmd.remove::<NeedsImageHandle>();
+    }
+}
+
+pub(crate) fn add_needed_atlas_handles(
+    mut commands: Commands,
+    mut query: Query<
+        (Entity, &Handle<Spritesheet>, Option<&mut TextureAtlas>),
+        With<NeedsAtlasHandle>,
+    >,
+    sheet_assets: Res<Assets<Spritesheet>>,
+) {
+    for (ent, sheet_handle, op_atlas) in &mut query {
+        let Some(sheet) = sheet_assets.get(sheet_handle) else {
+            continue;
+        };
+        if let Some(atlas_handle) = sheet.atlas_handle() {
+            if let Some(mut atlas) = op_atlas {
+                atlas.layout = atlas_handle;
+            }
+        } else {
+            commands.entity(ent).remove::<NeedsAtlasHandle>();
+        }
     }
 }
