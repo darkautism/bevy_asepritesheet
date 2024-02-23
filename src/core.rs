@@ -1,14 +1,18 @@
 use crate::{
-    animator::animate_sprites,
+    animator::{animate_sprites, AnimationSet},
     assets::SpritesheetAssetLoader,
     prelude::*,
     sprite::{add_needed_atlas_handles, add_needed_img_handles},
 };
-use bevy::{asset::AssetPath, prelude::*, sprite::Anchor};
+use bevy::{
+    asset::AssetPath, ecs::schedule::ScheduleLabel, prelude::*, sprite::Anchor,
+    utils::intern::Interned,
+};
 
 // Structs: -------------------------------------------------------------------
 
 pub struct AsepritesheetPlugin {
+    schedule: Option<Interned<dyn ScheduleLabel>>,
     extensions: Vec<&'static str>,
 }
 
@@ -44,23 +48,33 @@ impl Plugin for AsepritesheetPlugin {
         app.register_asset_loader(SpritesheetAssetLoader {
             extensions: self.extensions.clone(),
         })
-        .insert_resource(SpriteAnimController::default())
         .init_asset::<SpritesheetData>()
         .init_asset::<Spritesheet>()
         .add_event::<AnimFinishEvent>()
         .add_event::<SpritesheetLoadedEvent>()
-        .add_systems(PreUpdate, handle_spritesheet_loading)
-        .add_systems(
-            PostUpdate,
-            (
-                (
-                    add_needed_atlas_handles,
-                    add_needed_img_handles,
-                ),
-                animate_sprites,
-            )
-                .chain_ignore_deferred(),
-        );
+        .add_systems(PreUpdate, handle_spritesheet_loading);
+        if let Some(schedule) = self.schedule {
+            app.insert_resource(SpriteAnimController::default())
+                .configure_sets(
+                    schedule,
+                    AnimationSet
+                        .after_ignore_deferred(add_needed_atlas_handles)
+                        .after_ignore_deferred(add_needed_img_handles),
+                )
+                .add_systems(
+                    schedule,
+                    (
+                        add_needed_atlas_handles,
+                        add_needed_img_handles,
+                        animate_sprites.in_set(AnimationSet),
+                    ),
+                );
+        } else {
+            app.add_systems(
+                PreUpdate,
+                (add_needed_atlas_handles, add_needed_img_handles),
+            );
+        }
     }
 }
 
@@ -74,10 +88,23 @@ impl Default for SpriteAnimController {
 }
 
 impl AsepritesheetPlugin {
+    /// create a new instance of the asepritesheet plugin
     pub fn new(extensions: &[&'static str]) -> Self {
         AsepritesheetPlugin {
+            schedule: Some(PostUpdate.intern()),
             extensions: extensions.to_owned(),
         }
+    }
+    /// set the schedule that the animator system runs in, default is [`PostUpdate`]
+    pub fn in_schedule(mut self, schedule: impl ScheduleLabel) -> Self {
+        self.schedule = Some(schedule.intern());
+        self
+    }
+    /// spritesheets will not automatically animate, you will have to call the 'animate' function
+    /// on the [`SpriteAnimator`] component manually
+    pub fn without_anim(mut self) -> Self {
+        self.schedule = None;
+        self
     }
 }
 

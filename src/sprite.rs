@@ -347,13 +347,13 @@ impl AnimHandle {
 
 // Handle Verification: --------------------------------------------------------
 
-/// Marks an entity as needing to update the 'layout' TextureAtlasLayout handle 
+/// Marks an entity as needing to update the 'layout' TextureAtlasLayout handle
 /// property on the [`TextureAtlas`] component which is attached to the entity
 /// based on the TextureAtlasLayout specified in the spritesheet on the entity
 #[derive(Component, Default, Clone, Copy, Reflect, Debug, Serialize, Deserialize)]
 pub struct NeedsSheetAtlasHandle;
 
-/// Marks an entity as needing an image handle to match the spritesheet handle 
+/// Marks an entity as needing an image handle to match the spritesheet handle
 /// that's attached to it
 #[derive(Component, Default, Clone, Copy, Reflect, Debug, Serialize, Deserialize)]
 pub struct NeedsSheetImageHandle;

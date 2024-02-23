@@ -44,6 +44,11 @@ pub struct AnimFinishEvent {
     pub anim: AnimHandle,
 }
 
+/// the system set where the sprites are animated, but it really only contains one system
+/// [`animate_sprites`]
+#[derive(SystemSet, Debug, Reflect, Clone, Copy, Hash, PartialEq, Eq)]
+pub struct AnimationSet;
+
 // Struct Implementations: -----------------------------------------------------
 
 impl Default for SpriteAnimator {
@@ -304,7 +309,7 @@ impl SpriteAnimator {
 
 // Systems: --------------------------------------------------------------------
 
-/// system that runs in the [`PostUpdate`] schedule to update all the animated spritesheets in the
+/// system that runs in the specified plugin schedule to update all the animated spritesheets in the
 /// ecs world, some paramaters can be tweaked globally with the [`SpriteAnimController`] resource
 pub fn animate_sprites(
     time: Res<Time>,
@@ -325,14 +330,8 @@ pub fn animate_sprites(
     }
     let time_scale = anim_controller.global_time_scale;
     let dt = time.delta_seconds() * time_scale;
-    for (
-        entity,
-        mut sprite,
-        mut atlas,
-        mut sprite_animator,
-        sheet_handle,
-        maybe_evt_send,
-    ) in &mut query
+    for (entity, mut sprite, mut atlas, mut sprite_animator, sheet_handle, maybe_evt_send) in
+        &mut query
     {
         if let Some(sheet) = spritesheet_assets.get(sheet_handle) {
             // only pass in the event writer if the entity has the event sender component
