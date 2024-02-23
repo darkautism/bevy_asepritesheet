@@ -15,7 +15,7 @@ fn main() {
             // adding the SpritesheetAssetPlugin adds the asset loader to the game
             // and the AnimFinishEvent event which is sent whenever any animation
             // an animated spritesheet is complete
-            AsepritesheetPlugin::new(&["sprite.json"]),
+            AsepritesheetPlugin::new(&["sprite.json"]).in_schedule(Update),
         ))
         .add_systems(Startup, setup)
         .add_systems(
@@ -23,71 +23,6 @@ fn main() {
             (control_animation, log_anim_events, log_load_events),
         )
         .run();
-}
-
-// Utility: --------------------------------------------------------------------
-
-/// format the spritesheet animations for the witch character
-fn format_witch_anims(sheet: &mut Spritesheet) {
-    // get handles for all the needed animations
-    let handle_idle = sheet.get_anim_handle("idle");
-    let _handle_running = sheet.get_anim_handle("running");
-    let handle_bow = sheet.get_anim_handle("bow");
-    let handle_jump_prepare = sheet.get_anim_handle("jump_prepare");
-    let handle_jump = sheet.get_anim_handle("jump");
-    let handle_fall_transition = sheet.get_anim_handle("fall_transition");
-    let handle_falling = sheet.get_anim_handle("falling");
-    let handle_fall_land = sheet.get_anim_handle("fall_land");
-    let _handle_slide = sheet.get_anim_handle("slide");
-    let handle_attack_light = sheet.get_anim_handle("attack_light");
-    let handle_attack_heavy = sheet.get_anim_handle("attack_heavy");
-    let handle_damage = sheet.get_anim_handle("damage");
-    let _handle_face_background = sheet.get_anim_handle("face_background");
-
-    // have the bow animation pause at the end
-    if let Ok(anim_bow) = sheet.get_anim_mut(&handle_bow) {
-        anim_bow.end_action = AnimEndAction::Pause;
-    }
-
-    // when the jump prepare animation finishes, play the jump animation
-    if let Ok(anim_jump_prepare) = sheet.get_anim_mut(&handle_jump_prepare) {
-        anim_jump_prepare.end_action = AnimEndAction::Next(handle_jump);
-    }
-
-    // when the jump animation finishes, play the fall transition animation
-    if let Ok(anim_jump) = sheet.get_anim_mut(&handle_jump) {
-        anim_jump.end_action = AnimEndAction::Next(handle_fall_transition);
-    }
-
-    // when the fall transition animation finishes, play the falling animation
-    if let Ok(anim_fall_transition) = sheet.get_anim_mut(&handle_fall_transition) {
-        anim_fall_transition.end_action = AnimEndAction::Next(handle_falling);
-    }
-
-    // when the falling animation finishes, play the fall land animation
-    if let Ok(anim_falling) = sheet.get_anim_mut(&handle_falling) {
-        anim_falling.end_action = AnimEndAction::Next(handle_fall_land);
-    }
-
-    // when the fall land animation finishes, play the idle animation
-    if let Ok(anim_fall_land) = sheet.get_anim_mut(&handle_fall_land) {
-        anim_fall_land.end_action = AnimEndAction::Next(handle_idle);
-    }
-
-    // when the attack light animation finishes, play the idle animation
-    if let Ok(anim_attack_light) = sheet.get_anim_mut(&handle_attack_light) {
-        anim_attack_light.end_action = AnimEndAction::Next(handle_idle);
-    }
-
-    // when the attack_heavy animation finishes, play the idle animation
-    if let Ok(anim_attack_heavy) = sheet.get_anim_mut(&handle_attack_heavy) {
-        anim_attack_heavy.end_action = AnimEndAction::Next(handle_idle);
-    }
-
-    // when the damage animation finishes, play the idle animation
-    if let Ok(anim_damage) = sheet.get_anim_mut(&handle_damage) {
-        anim_damage.end_action = AnimEndAction::Next(handle_idle);
-    }
 }
 
 // Systems: --------------------------------------------------------------------
@@ -218,5 +153,70 @@ fn log_load_events(
             data.meta.frame_tags.len(),
             data.frames.len()
         )
+    }
+}
+
+// Utility: --------------------------------------------------------------------
+
+/// format the spritesheet animations for the witch character
+fn format_witch_anims(sheet: &mut Spritesheet) {
+    // get handles for all the needed animations
+    let handle_idle = sheet.get_anim_handle("idle");
+    let _handle_running = sheet.get_anim_handle("running");
+    let handle_bow = sheet.get_anim_handle("bow");
+    let handle_jump_prepare = sheet.get_anim_handle("jump_prepare");
+    let handle_jump = sheet.get_anim_handle("jump");
+    let handle_fall_transition = sheet.get_anim_handle("fall_transition");
+    let handle_falling = sheet.get_anim_handle("falling");
+    let handle_fall_land = sheet.get_anim_handle("fall_land");
+    let _handle_slide = sheet.get_anim_handle("slide");
+    let handle_attack_light = sheet.get_anim_handle("attack_light");
+    let handle_attack_heavy = sheet.get_anim_handle("attack_heavy");
+    let handle_damage = sheet.get_anim_handle("damage");
+    let _handle_face_background = sheet.get_anim_handle("face_background");
+
+    // have the bow animation pause at the end
+    if let Ok(anim_bow) = sheet.get_anim_mut(&handle_bow) {
+        anim_bow.end_action = AnimEndAction::Pause;
+    }
+
+    // when the jump prepare animation finishes, play the jump animation
+    if let Ok(anim_jump_prepare) = sheet.get_anim_mut(&handle_jump_prepare) {
+        anim_jump_prepare.end_action = AnimEndAction::Next(handle_jump);
+    }
+
+    // when the jump animation finishes, play the fall transition animation
+    if let Ok(anim_jump) = sheet.get_anim_mut(&handle_jump) {
+        anim_jump.end_action = AnimEndAction::Next(handle_fall_transition);
+    }
+
+    // when the fall transition animation finishes, play the falling animation
+    if let Ok(anim_fall_transition) = sheet.get_anim_mut(&handle_fall_transition) {
+        anim_fall_transition.end_action = AnimEndAction::Next(handle_falling);
+    }
+
+    // when the falling animation finishes, play the fall land animation
+    if let Ok(anim_falling) = sheet.get_anim_mut(&handle_falling) {
+        anim_falling.end_action = AnimEndAction::Next(handle_fall_land);
+    }
+
+    // when the fall land animation finishes, play the idle animation
+    if let Ok(anim_fall_land) = sheet.get_anim_mut(&handle_fall_land) {
+        anim_fall_land.end_action = AnimEndAction::Next(handle_idle);
+    }
+
+    // when the attack light animation finishes, play the idle animation
+    if let Ok(anim_attack_light) = sheet.get_anim_mut(&handle_attack_light) {
+        anim_attack_light.end_action = AnimEndAction::Next(handle_idle);
+    }
+
+    // when the attack_heavy animation finishes, play the idle animation
+    if let Ok(anim_attack_heavy) = sheet.get_anim_mut(&handle_attack_heavy) {
+        anim_attack_heavy.end_action = AnimEndAction::Next(handle_idle);
+    }
+
+    // when the damage animation finishes, play the idle animation
+    if let Ok(anim_damage) = sheet.get_anim_mut(&handle_damage) {
+        anim_damage.end_action = AnimEndAction::Next(handle_idle);
     }
 }

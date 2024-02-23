@@ -95,7 +95,7 @@ impl AsepritesheetPlugin {
             extensions: extensions.to_owned(),
         }
     }
-    /// set the schedule that the animator system runs in, default is [`PostUpdate`]
+    /// can be used to set the schedule that the animator system runs in, default is [`PostUpdate`]
     pub fn in_schedule(mut self, schedule: impl ScheduleLabel) -> Self {
         self.schedule = Some(schedule.intern());
         self
